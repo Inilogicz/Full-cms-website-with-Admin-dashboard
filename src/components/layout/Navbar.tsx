@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 
 const navLinks = [
     { name: 'Home', href: '/' },
@@ -61,27 +62,14 @@ export default function Navbar() {
                 <Link href="/" style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '10px',
-                    fontWeight: 800,
-                    fontSize: '1.25rem',
+                    gap: '12px',
+                    fontWeight: 900,
                     color: scrolled ? 'var(--primary)' : 'var(--white)',
-                    transition: 'color var(--transition-base)',
+                    transition: 'all var(--transition-base)',
+                    textShadow: scrolled ? 'none' : '0 2px 10px rgba(0,0,0,0.3)',
                 }}>
-                    <div style={{
-                        width: 36,
-                        height: 36,
-                        borderRadius: 'var(--radius-md)',
-                        background: 'var(--primary)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'white',
-                        fontWeight: 900,
-                        fontSize: '0.875rem',
-                    }}>
-                        NS
-                    </div>
-                    <span>Niger Sanitary</span>
+                    <Image src="/logo.png" alt="Logo" width={42} height={42} />
+                    <span style={{ letterSpacing: '-0.02em', fontSize: '1.25rem' }}>Niger<span style={{ color: 'var(--gold)' }}>Sanitary</span></span>
                 </Link>
 
                 {/* Desktop Nav */}
@@ -107,10 +95,11 @@ export default function Navbar() {
                                     gap: '4px',
                                     padding: '8px 14px',
                                     fontSize: '0.9375rem',
-                                    fontWeight: 500,
-                                    color: scrolled ? 'var(--gray-700)' : 'rgba(255,255,255,0.9)',
+                                    fontWeight: 600,
+                                    // color: scrolled ? 'var(--gray-700)' : 'var(--white)',
                                     borderRadius: 'var(--radius-md)',
                                     transition: 'all var(--transition-fast)',
+                                    textShadow: scrolled ? 'none' : '0 1px 2px rgba(0,0,0,0.1)',
                                 }}
                             >
                                 {link.name}
@@ -157,8 +146,16 @@ export default function Navbar() {
                     ))}
                     <Link
                         href="/distributor"
-                        className="btn btn-primary btn-sm"
-                        style={{ marginLeft: '8px' }}
+                        className="btn btn-sm"
+                        style={{
+                            marginLeft: '12px',
+                            background: 'var(--gradient-gold)',
+                            color: 'white',
+                            boxShadow: '0 4px 12px var(--gold-glow)',
+                            borderRadius: 'var(--radius-full)',
+                            padding: '10px 24px',
+                            border: 'none',
+                        }}
                     >
                         Become a Distributor
                     </Link>
@@ -246,15 +243,6 @@ export default function Navbar() {
                 )}
             </AnimatePresence>
 
-            <style jsx global>{`
-        @media (max-width: 1024px) {
-          .desktop-nav { display: none !important; }
-          .mobile-toggle { display: block !important; }
-        }
-        @media (min-width: 1025px) {
-          .mobile-menu { display: none !important; }
-        }
-      `}</style>
         </header>
     );
 }

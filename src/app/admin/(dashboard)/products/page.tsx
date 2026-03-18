@@ -1,10 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Search } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, Image as ImageIcon, X } from 'lucide-react';
+import MediaPicker from '@/components/admin/MediaPicker';
+
+interface Media {
+    id: string;
+    cloudinaryUrl: string;
+    altText?: string;
+}
 
 interface Product {
     id: string; name: string; slug: string; description: string; category: string; status: string; createdAt: string;
+    images?: Media[];
+    applications?: string;
+    packaging?: string;
 }
 
 export default function AdminProductsPage() {
@@ -13,19 +23,28 @@ export default function AdminProductsPage() {
     const [showForm, setShowForm] = useState(false);
     const [editing, setEditing] = useState<Product | null>(null);
     const [search, setSearch] = useState('');
+    const [showMediaPicker, setShowMediaPicker] = useState(false);
+    const [selectedImages, setSelectedImages] = useState<Media[]>([]);
 
     useEffect(() => { fetchProducts(); }, []);
 
-    async function fetchProducts() {
-        try {
-            const res = await fetch('/api/products');
-            const data = await res.json();
-            setProducts(data);
-        } catch { /* */ }
-        setLoading(false);
+    function fetchProducts() {
+        fetch('/api/products')
+            .then(res => res.json())
+            .then(data => setProducts(data))
+            .catch(() => { /* */ })
+            .finally(() => setLoading(false));
     }
 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    useEffect(() => {
+        if (editing) {
+            setSelectedImages(editing.images || []);
+        } else {
+            setSelectedImages([]);
+        }
+    }, [editing, showForm]);
+
+    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const data = {
@@ -35,21 +54,30 @@ export default function AdminProductsPage() {
             applications: formData.get('applications'),
             packaging: formData.get('packaging'),
             status: formData.get('status'),
+            imageIds: selectedImages.map(img => img.id),
         };
 
         const url = editing ? `/api/products/${editing.id}` : '/api/products';
         const method = editing ? 'PUT' : 'POST';
 
-        await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-        setShowForm(false);
-        setEditing(null);
-        fetchProducts();
+        fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+            .then(() => {
+                setShowForm(false);
+                setEditing(null);
+                fetchProducts();
+            })
+            .catch(() => { /* */ });
     }
 
-    async function handleDelete(id: string) {
+    function handleDelete(id: string) {
         if (!confirm('Delete this product?')) return;
-        await fetch(`/api/products/${id}`, { method: 'DELETE' });
-        fetchProducts();
+        fetch(`/api/products/${id}`, { method: 'DELETE' })
+            .then(() => fetchProducts())
+            .catch(() => { /* */ });
     }
 
     const filtered = products.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
@@ -58,7 +86,7 @@ export default function AdminProductsPage() {
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                 <h1 style={{ fontSize: '1.5rem' }}>Products</h1>
-                <button className="btn btn-primary" onClick={() => { setEditing(null); setShowForm(true); }}>
+                <button className="btn btn-primary" onClick={() => { setEditing(null); setSelectedImages([]); setShowForm(true); }}>
                     <Plus size={16} /> Add Product
                 </button>
             </div>
@@ -95,11 +123,11 @@ export default function AdminProductsPage() {
                             </div>
                             <div className="form-group">
                                 <label className="form-label">Applications</label>
-                                <textarea name="applications" className="form-textarea" rows={2} />
+                                <textarea name="applications" className="form-textarea" rows={2} defaultValue={editing?.applications} />
                             </div>
                             <div className="form-group">
                                 <label className="form-label">Packaging</label>
-                                <textarea name="packaging" className="form-textarea" rows={2} />
+                                <textarea name="packaging" className="form-textarea" rows={2} defaultValue={editing?.packaging} />
                             </div>
                             <div className="form-group">
                                 <label className="form-label">Status</label>
@@ -109,6 +137,33 @@ export default function AdminProductsPage() {
                                     <option value="archived">Archived</option>
                                 </select>
                             </div>
+
+                            <div className="form-group">
+                                <label className="form-label">Product Images</label>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px', marginBottom: '12px' }}>
+                                    {selectedImages.map(img => (
+                                        <div key={img.id} style={{ position: 'relative', aspectRatio: '1', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--gray-200)' }}>
+                                            <img src={img.cloudinaryUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            <button
+                                                type="button"
+                                                onClick={() => setSelectedImages(selectedImages.filter(i => i.id !== img.id))}
+                                                style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(0,0,0,0.5)', color: 'white', border: 'none', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                            >
+                                                <X size={12} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowMediaPicker(true)}
+                                        style={{ aspectRatio: '1', border: '2px dashed var(--gray-200)', borderRadius: 'var(--radius-md)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', color: 'var(--gray-400)', background: 'none', cursor: 'pointer' }}
+                                    >
+                                        <Plus size={20} />
+                                        <span style={{ fontSize: '0.75rem' }}>Add</span>
+                                    </button>
+                                </div>
+                            </div>
+
                             <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
                                 <button type="button" className="btn btn-ghost" onClick={() => setShowForm(false)}>Cancel</button>
                                 <button type="submit" className="btn btn-primary">Save Product</button>
@@ -132,7 +187,14 @@ export default function AdminProductsPage() {
                                 <tr><td colSpan={4} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '40px' }}>No products found</td></tr>
                             ) : filtered.map(p => (
                                 <tr key={p.id}>
-                                    <td style={{ fontWeight: 500 }}>{p.name}</td>
+                                    <td>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', overflow: 'hidden', background: 'var(--gray-100)', flexShrink: 0 }}>
+                                                {p.images?.[0] ? <img src={p.images[0].cloudinaryUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <ImageIcon size={20} style={{ margin: 10, color: 'var(--gray-300)' }} />}
+                                            </div>
+                                            <span style={{ fontWeight: 500 }}>{p.name}</span>
+                                        </div>
+                                    </td>
                                     <td><span className="badge badge-primary">{p.category}</span></td>
                                     <td><span className={`badge badge-${p.status === 'published' ? 'success' : p.status === 'draft' ? 'warning' : 'info'}`}>{p.status}</span></td>
                                     <td>
@@ -146,6 +208,16 @@ export default function AdminProductsPage() {
                         </tbody>
                     </table>
                 </div>
+            )}
+
+            {showMediaPicker && (
+                <MediaPicker
+                    allowMultiple
+                    selectedIds={selectedImages.map(img => img.id)}
+                    onSelectMultiple={(items) => setSelectedImages([...selectedImages, ...items.filter(item => !selectedImages.find(si => si.id === item.id))])}
+                    onSelect={() => { }}
+                    onClose={() => setShowMediaPicker(false)}
+                />
             )}
         </div>
     );

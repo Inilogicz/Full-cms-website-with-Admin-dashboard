@@ -1,115 +1,175 @@
-import { prisma } from '@/lib/prisma';
+'use client';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Metadata } from 'next';
-import { Calendar, ArrowRight } from 'lucide-react';
-
-export const metadata: Metadata = {
-    title: 'Menstrual Health Education Hub',
-    description: 'Educational resources on menstrual health awareness, women empowerment, puberty education, and healthcare insights.',
-};
-
-const defaultPosts = [
-    { id: '1', title: 'Understanding Menstrual Hygiene: A Complete Guide', slug: 'understanding-menstrual-hygiene', excerpt: 'Learn about the importance of menstrual hygiene and how to practice safe hygiene during menstruation.', category: 'Menstrual Health', publishedAt: new Date('2024-01-15'), featured: true },
-    { id: '2', title: 'Breaking the Stigma: Empowering Women Through Education', slug: 'breaking-the-stigma', excerpt: 'How community education programs are changing attitudes towards menstruation across Nigeria.', category: 'Women Empowerment', publishedAt: new Date('2024-02-10'), featured: true },
-    { id: '3', title: 'Puberty and Menstruation: What Every Young Girl Should Know', slug: 'puberty-and-menstruation', excerpt: 'A comprehensive guide for young girls approaching puberty and their first menstruation.', category: 'Puberty Education', publishedAt: new Date('2024-03-05'), featured: false },
-    { id: '4', title: 'Choosing the Right Sanitary Products for Your Needs', slug: 'choosing-right-sanitary-products', excerpt: 'A detailed comparison of different sanitary product types to help you make informed decisions.', category: 'Healthcare Insights', publishedAt: new Date('2024-04-20'), featured: false },
-    { id: '5', title: 'The Impact of Menstrual Health on Education in Nigeria', slug: 'menstrual-health-education-impact', excerpt: 'How menstrual health challenges affect school attendance and academic performance.', category: 'Menstrual Health', publishedAt: new Date('2024-05-12'), featured: false },
-    { id: '6', title: 'Sustainable Approaches to Menstrual Product Manufacturing', slug: 'sustainable-manufacturing', excerpt: 'Our commitment to environmental responsibility in sanitary product production.', category: 'Healthcare Insights', publishedAt: new Date('2024-06-08'), featured: false },
-];
+import { motion } from 'framer-motion';
+import { Calendar, ArrowRight, BookOpen, Clock, User } from 'lucide-react';
+import FlipCard from '@/components/ui/FlipCard';
 
 const categories = ['All', 'Menstrual Health', 'Women Empowerment', 'Puberty Education', 'Healthcare Insights'];
 
-export default async function BlogPage() {
-    let posts = defaultPosts;
-    try {
-        const dbPosts = await prisma.blogPost.findMany({ where: { status: 'published' }, orderBy: { publishedAt: 'desc' } });
-        if (dbPosts.length > 0) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            posts = dbPosts.map((p: any) => ({ id: p.id, title: p.title, slug: p.slug, excerpt: p.excerpt || '', category: p.category, publishedAt: p.publishedAt || new Date(), featured: p.featured }));
+export default function BlogPage() {
+    const [posts, setPosts] = useState<any[]>([]);
+    const [activeCategory, setActiveCategory] = useState('All');
 
-        }
-    } catch { /* defaults */ }
+    useEffect(() => {
+        const fetchPosts = async () => {
+            try {
+                const res = await fetch('/api/blog?status=published');
+                const data = await res.json();
+                if (data) {
+                    setPosts(data.map((p: any) => ({
+                        id: p.id,
+                        title: p.title,
+                        slug: p.slug,
+                        excerpt: p.excerpt || '',
+                        category: p.category,
+                        publishedAt: p.publishedAt || new Date(),
+                        featuredImage: p.featuredImage
+                    })));
+                }
+            } catch (err) {
+                console.error("Failed to fetch posts:", err);
+            }
+        };
+        fetchPosts();
+    }, []);
 
-    const featuredPosts = posts.filter(p => p.featured);
+    const filteredPosts = activeCategory === 'All'
+        ? posts
+        : posts.filter(p => p.category === activeCategory);
 
     return (
-        <>
-            <section style={{ paddingTop: '160px', paddingBottom: '80px', background: 'var(--gradient-hero)' }}>
-                <div className="container">
-                    <span className="section-label" style={{ color: 'var(--accent-light)' }}>Education Hub</span>
-                    <h1 style={{ color: 'var(--white)', maxWidth: '640px', marginBottom: '20px' }}>Menstrual Health Education</h1>
-                    <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '1.125rem', maxWidth: '560px', lineHeight: 1.7 }}>
-                        Empowering communities through knowledge, awareness, and health education resources.
-                    </p>
+        <div className="blog-wrapper">
+            {/* Hero Section - Lightened */}
+            <section style={{
+                paddingTop: '160px',
+                paddingBottom: '100px',
+                background: 'linear-gradient(to bottom, #f8faff 0%, #ffffff 100%)',
+                position: 'relative',
+                overflow: 'hidden'
+            }}>
+                <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        <span className="section-label" style={{ color: 'var(--gold-dark)', fontWeight: 800 }}>Education Hub</span>
+                        <h1 style={{ color: 'var(--primary-dark)', marginBottom: '24px', fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 900 }}>
+                            Empowering Through <br />
+                            <span className="text-gradient-gold">Health Knowledge</span>
+                        </h1>
+                        <p style={{ color: 'var(--gray-600)', fontSize: '1.25rem', maxWidth: '600px', lineHeight: 1.7 }}>
+                            Educational resources on menstrual health awareness, women empowerment, and healthcare insights.
+                        </p>
+                    </motion.div>
                 </div>
+
+                <div style={{
+                    position: 'absolute',
+                    top: '-10%',
+                    left: '-5%',
+                    width: '500px',
+                    height: '500px',
+                    background: 'radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%)',
+                    borderRadius: '50%',
+                    filter: 'blur(100px)',
+                    zIndex: 1
+                }} />
             </section>
 
-            {/* Categories */}
-            <section style={{ borderBottom: '1px solid var(--gray-100)', background: 'var(--white)' }}>
-                <div className="container" style={{ display: 'flex', gap: '8px', padding: '16px 24px', overflowX: 'auto' }}>
+            {/* Categories - Sleeker */}
+            <section style={{ borderBottom: '1px solid var(--gray-100)', background: 'white', position: 'sticky', top: '72px', zIndex: 50 }}>
+                <div className="container" style={{ display: 'flex', gap: '12px', padding: '20px 0', overflowX: 'auto', scrollbarWidth: 'none' }}>
                     {categories.map(cat => (
-                        <span key={cat} className="badge badge-primary" style={{ cursor: 'pointer', whiteSpace: 'nowrap', padding: '8px 16px' }}>
+                        <button
+                            key={cat}
+                            onClick={() => setActiveCategory(cat)}
+                            style={{
+                                padding: '8px 20px',
+                                borderRadius: 'var(--radius-full)',
+                                border: '1px solid',
+                                borderColor: activeCategory === cat ? 'var(--gold)' : 'var(--gray-200)',
+                                background: activeCategory === cat ? 'var(--gold-50)' : 'transparent',
+                                color: activeCategory === cat ? 'var(--gold-dark)' : 'var(--gray-500)',
+                                fontSize: '0.8125rem',
+                                fontWeight: 700,
+                                whiteSpace: 'nowrap',
+                                transition: 'all 0.3s ease',
+                                cursor: 'pointer'
+                            }}
+                        >
                             {cat}
-                        </span>
+                        </button>
                     ))}
                 </div>
             </section>
 
-            {/* Featured Posts */}
-            {featuredPosts.length > 0 && (
-                <section className="section" style={{ background: 'var(--gray-50)' }}>
-                    <div className="container">
-                        <h2 style={{ fontSize: '1.5rem', marginBottom: '24px' }}>Featured Articles</h2>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
-                            {featuredPosts.map(post => (
-                                <Link key={post.id} href={`/blog/${post.slug}`} style={{ display: 'block' }}>
-                                    <div className="card" style={{ height: '100%' }}>
-                                        <div style={{ background: 'var(--gradient-primary)', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '48px' }}>📚</div>
-                                        <div className="card-body">
-                                            <span className="badge badge-primary" style={{ marginBottom: '10px' }}>{post.category}</span>
-                                            <h3 style={{ fontSize: '1.125rem', marginBottom: '8px' }}>{post.title}</h3>
-                                            <p style={{ fontSize: '0.875rem', color: 'var(--gray-500)', marginBottom: '12px', lineHeight: 1.6 }}>{post.excerpt}</p>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8125rem', color: 'var(--gray-400)' }}>
-                                                <Calendar size={14} />
-                                                {new Date(post.publishedAt).toLocaleDateString('en-NG', { year: 'numeric', month: 'long', day: 'numeric' })}
+            {/* Posts Grid - With Flip */}
+            <section className="section" style={{ padding: '80px 0' }}>
+                <div className="container">
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                        gap: '32px',
+                    }}>
+                        {filteredPosts.map((post) => (
+                            <FlipCard
+                                key={post.id}
+                                height="400px"
+                                front={
+                                    <div className="card h-full" style={{
+                                        height: '100%',
+                                        borderRadius: 'var(--radius-xl)',
+                                        border: '1px solid var(--gray-100)',
+                                        background: 'white',
+                                        overflow: 'hidden'
+                                    }}>
+                                        <div style={{ height: '200px', background: 'var(--gray-50)', position: 'relative' }}>
+                                            {post.featuredImage ? (
+                                                <img src={post.featuredImage} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            ) : (
+                                                <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.1 }}><BookOpen size={48} /></div>
+                                            )}
+                                        </div>
+                                        <div className="card-body" style={{ padding: '24px' }}>
+                                            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                                                <span style={{ fontSize: '0.6875rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--gold-dark)', background: 'var(--gold-50)', padding: '4px 8px', borderRadius: '4px' }}>{post.category}</span>
+                                            </div>
+                                            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '12px', color: 'var(--gray-900)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{post.title}</h3>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.75rem', color: 'var(--gray-400)' }}>
+                                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={14} /> 5 min read</span>
+                                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Calendar size={14} /> {new Date(post.publishedAt).toLocaleDateString()}</span>
                                             </div>
                                         </div>
                                     </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-            )}
-
-            {/* All Posts */}
-            <section className="section">
-                <div className="container">
-                    <h2 style={{ fontSize: '1.5rem', marginBottom: '24px' }}>All Articles</h2>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
-                        {posts.map(post => (
-                            <Link key={post.id} href={`/blog/${post.slug}`} style={{ display: 'block' }}>
-                                <div className="card" style={{ height: '100%' }}>
-                                    <div className="card-body">
-                                        <span className="badge badge-primary" style={{ marginBottom: '10px' }}>{post.category}</span>
-                                        <h3 style={{ fontSize: '1.0625rem', marginBottom: '8px' }}>{post.title}</h3>
-                                        <p style={{ fontSize: '0.875rem', color: 'var(--gray-500)', lineHeight: 1.6, marginBottom: '12px' }}>{post.excerpt}</p>
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                            <span style={{ fontSize: '0.8125rem', color: 'var(--gray-400)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                <Calendar size={14} />
-                                                {new Date(post.publishedAt).toLocaleDateString('en-NG', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                            </span>
-                                            <span style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                Read <ArrowRight size={14} />
-                                            </span>
-                                        </div>
+                                }
+                                back={
+                                    <div style={{
+                                        background: 'var(--primary-dark)',
+                                        height: '100%',
+                                        borderRadius: 'var(--radius-xl)',
+                                        padding: '40px 32px',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        justifyContent: 'center',
+                                        color: 'white',
+                                        textAlign: 'center'
+                                    }}>
+                                        <h3 style={{ fontSize: '1.375rem', fontWeight: 800, marginBottom: '20px', color: 'var(--gold)' }}>Quick Preview</h3>
+                                        <p style={{ fontSize: '0.9375rem', opacity: 0.8, lineHeight: 1.6, marginBottom: '32px' }}>{post.excerpt}</p>
+                                        <Link href={`/blog/${post.slug}`} className="btn btn-lg" style={{ background: 'var(--gold)', color: 'white', alignSelf: 'center' }}>
+                                            Read Full Article
+                                        </Link>
                                     </div>
-                                </div>
-                            </Link>
+                                }
+                            />
                         ))}
                     </div>
                 </div>
             </section>
-        </>
+
+        </div>
     );
 }

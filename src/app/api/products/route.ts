@@ -27,6 +27,9 @@ export async function POST(req: NextRequest) {
                 applications: data.applications,
                 packaging: data.packaging,
                 status: data.status || 'published',
+                images: data.imageIds ? {
+                    connect: data.imageIds.map((id: string) => ({ id }))
+                } : undefined
             },
         });
 

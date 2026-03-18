@@ -16,6 +16,9 @@ export async function PUT(req: NextRequest, context: RouteContext) {
                 location: data.location,
                 category: data.category,
                 status: data.status,
+                images: data.imageIds ? {
+                    set: data.imageIds.map((id: string) => ({ id }))
+                } : undefined
             },
         });
         return NextResponse.json(event);

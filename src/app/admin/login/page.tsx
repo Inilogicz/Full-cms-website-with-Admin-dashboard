@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock, Mail, Eye, EyeOff } from 'lucide-react';
+import Image from 'next/image';
 
 export default function AdminLoginPage() {
     const [email, setEmail] = useState('');
@@ -12,30 +13,30 @@ export default function AdminLoginPage() {
     const [error, setError] = useState('');
     const router = useRouter();
 
-    async function handleLogin(e: React.FormEvent) {
+    function handleLogin(e: React.FormEvent) {
         e.preventDefault();
         setLoading(true);
         setError('');
 
-        try {
-            const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
+        fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+        })
+            .then(res => res.json().then(data => ({ ok: res.ok, data })))
+            .then(({ ok, data }) => {
+                if (ok) {
+                    router.push('/admin');
+                } else {
+                    setError(data.error || 'Login failed');
+                }
+            })
+            .catch(() => {
+                setError('Network error. Please try again.');
+            })
+            .finally(() => {
+                setLoading(false);
             });
-
-            const data = await res.json();
-
-            if (res.ok) {
-                router.push('/admin');
-            } else {
-                setError(data.error || 'Login failed');
-            }
-        } catch {
-            setError('Network error. Please try again.');
-        } finally {
-            setLoading(false);
-        }
     }
 
     return (
@@ -56,21 +57,7 @@ export default function AdminLoginPage() {
                 boxShadow: 'var(--shadow-xl)',
             }}>
                 <div style={{ textAlign: 'center', marginBottom: '36px' }}>
-                    <div style={{
-                        width: 56,
-                        height: 56,
-                        borderRadius: 'var(--radius-lg)',
-                        background: 'var(--primary)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'white',
-                        fontWeight: 900,
-                        fontSize: '1.125rem',
-                        margin: '0 auto 16px',
-                    }}>
-                        NS
-                    </div>
+                    <Image src="/logo.png" alt="Logo" width={46} height={46} style={{ borderRadius: 'var(--radius-lg)', margin: '0 auto 16px' }} />
                     <h1 style={{ fontSize: '1.5rem', marginBottom: '4px' }}>Admin Login</h1>
                     <p style={{ color: 'var(--gray-500)', fontSize: '0.9375rem' }}>Sign in to manage your platform</p>
                 </div>
@@ -99,7 +86,7 @@ export default function AdminLoginPage() {
                                 style={{ paddingLeft: '40px' }}
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="admin@nigersanitary.com"
+                                placeholder="Enter your email"
                                 required
                             />
                         </div>

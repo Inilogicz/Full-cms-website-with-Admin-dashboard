@@ -16,6 +16,16 @@
   --accent: #00B4D8;
   --accent-light: #48CAE4;
 
+  /* Brand Gold - Refined Metallic */
+  --gold: #D4AF37;
+  /* Metallic Gold */
+  --gold-light: #F9E2AF;
+  /* Pale Gold */
+  --gold-dark: #B8860B;
+  /* Dark Goldenrod */
+  --gold-50: #FFFDF5;
+  --gold-glow: rgba(212, 175, 55, 0.3);
+
   /* Neutrals */
   --white: #FFFFFF;
   --gray-50: #F8FAFC;
@@ -35,11 +45,13 @@
   --error: #EF4444;
   --info: #3B82F6;
 
-  /* Gradients */
+  /* Gradients - Refined */
   --gradient-primary: linear-gradient(135deg, #0A4DA2 0%, #1565C0 50%, #00B4D8 100%);
-  --gradient-hero: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/hero-bg.jpg');
+  --gradient-gold: linear-gradient(135deg, #D4AF37 0%, #F9E2AF 50%, #B8860B 100%);
+  --gradient-hero: linear-gradient(to bottom, rgba(10, 77, 162, 0.4) 0%, rgba(255, 255, 255, 1) 100%);
   --gradient-hero-light: linear-gradient(135deg, #F8FAFC 0%, #F0F7FF 100%);
-  --gradient-card: linear-gradient(135deg, #F8FAFC 0%, #F0F7FF 100%);
+  --gradient-card: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
+  --gradient-premium: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%);
 
   /* Shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -483,6 +495,68 @@ a {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.glass-premium {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.text-gradient-gold {
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* 3D Flip Card Utilities */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+.border-gold {
+  border: 1px solid var(--gold);
+}
+
+.bg-gold {
+  background-color: var(--gold);
+}
+
+.text-gold {
+  color: var(--gold);
+}
+
+.stat-card {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.stat-card:hover {
+  transform: translateY(-8px);
+  background: var(--white) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card:hover .stat-icon {
+  transform: scale(1.2) rotate(8deg);
+  background: var(--primary) !important;
+  color: var(--white) !important;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .section {
@@ -554,4 +628,232 @@ a {
   .responsive-grid-2 {
     grid-template-columns: 1fr !important;
   }
+}
+
+/* Homepage Refinements */
+.homepage-wrapper {
+  overflow: hidden;
+  background: #fff;
+}
+
+.stat-card-refined {
+  transition: all 0.4s ease;
+}
+
+.stat-card-refined:hover {
+  transform: translateY(-8px);
+  border-color: var(--gold-light);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card-refined:hover .stat-icon-box {
+  transform: scale(1.1);
+}
+
+.skeleton-card {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Footer Hover Effects */
+.hover-gold {
+  transition: color 0.3s ease;
+}
+
+.hover-gold:hover {
+  color: var(--gold);
+}
+
+@media (max-width: 1024px) {
+  .homepage-wrapper section {
+    padding: 80px 0 !important;
+  }
+
+  .homepage-wrapper .container>div {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+
+  .homepage-wrapper h1 {
+    font-size: 3rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .homepage-wrapper .container>div:has(.stat-card-refined) {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .homepage-wrapper .hero-media-container {
+    display: none !important;
+  }
+}
+
+/* Blog & Events Wrappers */
+.blog-wrapper,
+.events-wrapper {
+  background: white;
+  min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .events-wrapper .card {
+    flex-direction: column !important;
+  }
+
+  .events-wrapper .card>div:first-child {
+    width: 100% !important;
+    height: 180px !important;
+  }
+}
+
+/* Admin Dashboard Layout */
+@media (max-width: 1024px) {
+  .admin-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .mobile-menu-btn {
+    display: block !important;
+  }
+
+  /* Removed to avoid Turbopack issues */
+}
+
+/* About Page */
+.about-wrapper {
+  overflow: hidden;
+  background: white;
+}
+
+@media (max-width: 768px) {
+  .about-wrapper .responsive-grid-2 {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+  }
+
+  .about-wrapper section {
+    padding: 80px 0 !important;
+  }
+}
+
+/* Trust Page */
+.trust-wrapper {
+  background: white;
+  min-height: 100vh;
+}
+
+.trust-wrapper .card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.08) !important;
+  border-color: var(--gold-light) !important;
+}
+
+/* FAQ Page */
+.faq-wrapper {
+  background: #fdfdfd;
+  min-height: 100vh;
+}
+
+.faq-wrapper .glass-premium:hover {
+  border-color: var(--gold-light) !important;
+  transform: translateY(-2px);
+}
+
+/* Distributor Page */
+.distributor-wrapper {
+  background: white;
+  min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .distributor-wrapper form>div {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .distributor-wrapper .glass-premium {
+    padding: 40px 24px !important;
+  }
+}
+
+/* Gallery Page */
+.gallery-wrapper {
+  background: white;
+  min-height: 100vh;
+}
+
+.gallery-wrapper .group:hover .card {
+  transform: translateY(-8px);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1) !important;
+  border-color: var(--gold-light) !important;
+}
+
+/* Contact Page */
+.contact-wrapper {
+  background: white;
+  min-height: 100vh;
+}
+
+@media (max-width: 991px) {
+  .contact-wrapper .responsive-grid {
+    grid-template-columns: 1fr !important;
+    gap: 60px !important;
+  }
+}
+
+/* Navbar */
+@media (max-width: 1024px) {
+  .desktop-nav {
+    display: none !important;
+  }
+
+  .mobile-toggle {
+    display: block !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .mobile-menu {
+    display: none !important;
+  }
+}
+
+/* Blog Content */
+.blog-content h2 {
+  font-size: 1.75rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--secondary);
+  font-weight: 700;
+}
+
+.blog-content p {
+  margin-bottom: 1.5rem;
+}
+
+.blog-content ul {
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+.blog-content li {
+  margin-bottom: 0.5rem;
+}
+
+/* Product Page wrapper */
+.products-wrapper {
+  background: white;
+  min-height: 100vh;
 }

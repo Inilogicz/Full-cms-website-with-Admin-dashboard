@@ -17,9 +17,12 @@ export default function AdminLeadsPage() {
 
     useEffect(() => { fetchLeads(); }, []);
 
-    async function fetchLeads() {
-        try { const res = await fetch('/api/distributor-leads'); setLeads(await res.json()); } catch { }
-        setLoading(false);
+    function fetchLeads() {
+        fetch('/api/distributor-leads')
+            .then(res => res.json())
+            .then(data => setLeads(data))
+            .catch(() => { /* */ })
+            .finally(() => setLoading(false));
     }
 
     const filtered = leads.filter(l =>

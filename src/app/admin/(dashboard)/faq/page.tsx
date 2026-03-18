@@ -14,23 +14,42 @@ export default function AdminFAQPage() {
 
     useEffect(() => { fetchFAQs(); }, []);
 
-    async function fetchFAQs() {
-        try { const res = await fetch('/api/faq'); setFaqs(await res.json()); } catch { }
-        setLoading(false);
+    function fetchFAQs() {
+        fetch('/api/faq')
+            .then(res => res.json())
+            .then(data => setFaqs(data))
+            .catch(() => { /* */ })
+            .finally(() => setLoading(false));
     }
 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         const fd = new FormData(e.currentTarget);
-        const data = { question: fd.get('question'), answer: fd.get('answer'), category: fd.get('category'), order: parseInt(fd.get('order') as string) || 0 };
+        const data = {
+            question: fd.get('question'),
+            answer: fd.get('answer'),
+            category: fd.get('category'),
+            order: parseInt(fd.get('order') as string || '0'),
+        };
         const url = editing ? `/api/faq/${editing.id}` : '/api/faq';
-        await fetch(url, { method: editing ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-        setShowForm(false); setEditing(null); fetchFAQs();
+        fetch(url, {
+            method: editing ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+            .then(() => {
+                setShowForm(false);
+                setEditing(null);
+                fetchFAQs();
+            })
+            .catch(() => { /* */ });
     }
 
-    async function handleDelete(id: string) {
-        if (!confirm('Delete?')) return;
-        await fetch(`/api/faq/${id}`, { method: 'DELETE' }); fetchFAQs();
+    function handleDelete(id: string) {
+        if (!confirm('Delete this FAQ?')) return;
+        fetch(`/api/faq/${id}`, { method: 'DELETE' })
+            .then(() => fetchFAQs())
+            .catch(() => { /* */ });
     }
 
     const filtered = faqs.filter(f => f.question.toLowerCase().includes(search.toLowerCase()));

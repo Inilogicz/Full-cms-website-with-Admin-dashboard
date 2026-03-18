@@ -1,74 +1,160 @@
-import { prisma } from '@/lib/prisma';
-import { Metadata } from 'next';
-import { Calendar, MapPin } from 'lucide-react';
+'use client';
 
-export const metadata: Metadata = {
-    title: 'Events & Outreach',
-    description: 'Discover our CSR initiatives, product launches, menstrual health campaigns, and community outreach activities.',
-};
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Calendar, MapPin, Image as ImageIcon, ArrowRight, Share2, Info } from 'lucide-react';
+import FlipCard from '@/components/ui/FlipCard';
 
-const defaultEvents = [
-    { id: '1', title: 'World Menstrual Hygiene Day Campaign', description: 'Annual campaign to raise awareness about menstrual hygiene and distribute free sanitary products to girls in rural communities.', eventDate: new Date('2024-05-28'), location: 'Niger State, Nigeria', category: 'CSR' },
-    { id: '2', title: 'LadySept Product Launch Event', description: 'Launch of the new LadySept Ultra range with improved absorbency and comfort features.', eventDate: new Date('2024-03-15'), location: 'Lagos, Nigeria', category: 'Product Launch' },
-    { id: '3', title: 'School Menstrual Health Education Program', description: 'Educational sessions at secondary schools covering menstrual health, hygiene practices, and breaking stigma.', eventDate: new Date('2024-06-10'), location: 'Abuja, Nigeria', category: 'Health Campaign' },
-    { id: '4', title: 'ISO Certification Milestone', description: 'Achieved ISO 9001:2015 certification for quality management systems, marking a significant milestone in our manufacturing excellence journey.', eventDate: new Date('2024-01-20'), location: 'Niger State, Nigeria', category: 'Milestone' },
-    { id: '5', title: 'Community Health Fair', description: 'Participated in the annual community health fair providing free health screenings and sanitary product samples.', eventDate: new Date('2024-07-05'), location: 'Kaduna, Nigeria', category: 'CSR' },
-];
+export default function EventsPage() {
+    const [events, setEvents] = useState<any[]>([]);
 
-export default async function EventsPage() {
-    let events = defaultEvents;
-    try {
-        const dbEvents = await prisma.event.findMany({ where: { status: 'published' }, orderBy: { eventDate: 'desc' } });
-        if (dbEvents.length > 0) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            events = dbEvents.map((e: any) => ({ id: e.id, title: e.title, description: e.description, eventDate: e.eventDate, location: e.location || '', category: e.category || '' }));
-
-        }
-    } catch { /* defaults */ }
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                const res = await fetch('/api/events?status=published');
+                const data = await res.json();
+                if (data) {
+                    setEvents(data.map((e: any) => ({
+                        id: e.id,
+                        title: e.title,
+                        description: e.description,
+                        eventDate: e.eventDate,
+                        location: e.location || '',
+                        category: e.category || '',
+                        imageUrl: e.images?.[0]?.cloudinaryUrl
+                    })));
+                }
+            } catch (err) {
+                console.error("Failed to fetch events:", err);
+            }
+        };
+        fetchEvents();
+    }, []);
 
     return (
-        <>
-            <section style={{ paddingTop: '160px', paddingBottom: '80px', background: 'var(--gradient-hero)' }}>
-                <div className="container">
-                    <span className="section-label" style={{ color: 'var(--accent-light)' }}>Events</span>
-                    <h1 style={{ color: 'var(--white)', maxWidth: '640px', marginBottom: '20px' }}>Events & Outreach</h1>
-                    <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '1.125rem', maxWidth: '560px', lineHeight: 1.7 }}>
-                        Our activities, CSR initiatives, product launches, and community engagement programs.
-                    </p>
+        <div className="events-wrapper">
+            {/* Hero Section - Lightened */}
+            <section style={{
+                paddingTop: '160px',
+                paddingBottom: '100px',
+                background: 'linear-gradient(to bottom, #f8faff 0%, #ffffff 100%)',
+                position: 'relative',
+                overflow: 'hidden'
+            }}>
+                <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        <span className="section-label" style={{ color: 'var(--gold-dark)', fontWeight: 800 }}>Events & Outreach</span>
+                        <h1 style={{ color: 'var(--primary-dark)', marginBottom: '24px', fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 900 }}>
+                            Community & <br />
+                            <span className="text-gradient-gold">Impact Initiatives</span>
+                        </h1>
+                        <p style={{ color: 'var(--gray-600)', fontSize: '1.25rem', maxWidth: '600px', lineHeight: 1.7 }}>
+                            Discover our CSR initiatives, product launches, and menstrual health campaigns across Nigeria.
+                        </p>
+                    </motion.div>
+                </div>
+
+                <div style={{
+                    position: 'absolute',
+                    top: '-10%',
+                    right: '-5%',
+                    width: '500px',
+                    height: '500px',
+                    background: 'radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%)',
+                    borderRadius: '50%',
+                    filter: 'blur(100px)',
+                    zIndex: 1
+                }} />
+            </section>
+
+            {/* Events Timeline/Grid - With Flip */}
+            <section className="section" style={{ padding: '80px 0' }}>
+                <div className="container" style={{ maxWidth: '1000px' }}>
+                    {events.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '100px 0', color: 'var(--gray-400)' }}>
+                            <p style={{ fontSize: '1.25rem' }}>No upcoming events scheduled. Stay tuned!</p>
+                        </div>
+                    ) : (
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '48px' }}>
+                            {events.map((event, i) => (
+                                <FlipCard
+                                    key={event.id}
+                                    height="300px"
+                                    front={
+                                        <div className="card h-full" style={{
+                                            display: 'flex',
+                                            flexDirection: 'row',
+                                            overflow: 'hidden',
+                                            borderRadius: 'var(--radius-2xl)',
+                                            border: '1px solid var(--gray-100)',
+                                            background: 'white',
+                                            boxShadow: '0 4px 20px rgba(0,0,0,0.03)'
+                                        }}>
+                                            <div style={{ width: '320px', background: 'var(--gray-50)', flexShrink: 0 }}>
+                                                {event.imageUrl ? (
+                                                    <img src={event.imageUrl} alt={event.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                ) : (
+                                                    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.1 }}><ImageIcon size={64} /></div>
+                                                )}
+                                            </div>
+                                            <div className="card-body" style={{ padding: '40px', flex: 1, position: 'relative' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+                                                    <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--gold-dark)', background: 'var(--gold-50)', padding: '4px 12px', borderRadius: 'var(--radius-full)' }}>{event.category}</span>
+                                                    <div style={{ width: '1px', height: '16px', background: 'var(--gray-200)' }} />
+                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8125rem', color: 'var(--gray-400)', fontWeight: 600 }}>
+                                                        <Calendar size={14} />
+                                                        {new Date(event.eventDate).toLocaleDateString('en-NG', { month: 'long', day: 'numeric', year: 'numeric' })}
+                                                    </span>
+                                                </div>
+                                                <h3 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '16px', color: 'var(--primary-dark)' }}>{event.title}</h3>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--gray-500)', fontSize: '0.875rem' }}>
+                                                    <MapPin size={16} style={{ color: 'var(--gold)' }} />
+                                                    {event.location}
+                                                </div>
+                                                <div style={{ position: 'absolute', bottom: '40px', right: '40px', color: 'var(--gold)', fontWeight: 800, fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                    Quick View <ArrowRight size={14} />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    back={
+                                        <div style={{
+                                            background: 'var(--primary-dark)',
+                                            height: '100%',
+                                            borderRadius: 'var(--radius-2xl)',
+                                            padding: '40px',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            justifyContent: 'center',
+                                            color: 'white',
+                                            textAlign: 'left'
+                                        }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                                                <h3 style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--gold)' }}>Event Details</h3>
+                                                <div style={{ display: 'flex', gap: '12px' }}>
+                                                    <button style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: 'white', padding: '8px', borderRadius: '50%', cursor: 'pointer' }}><Share2 size={16} /></button>
+                                                    <button style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: 'white', padding: '8px', borderRadius: '50%', cursor: 'pointer' }}><Info size={16} /></button>
+                                                </div>
+                                            </div>
+                                            <p style={{ fontSize: '1rem', opacity: 0.8, lineHeight: 1.7, marginBottom: '32px', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{event.description}</p>
+                                            <div style={{ display: 'flex', gap: '12px' }}>
+                                                <Link href={`/contact`} className="btn btn-sm" style={{ background: 'var(--gold)', color: 'white', fontWeight: 800 }}>Inquire More</Link>
+                                                <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center' }}>Limited spots available</div>
+                                            </div>
+                                        </div>
+                                    }
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
             </section>
 
-            <section className="section">
-                <div className="container" style={{ maxWidth: '880px' }}>
-                    {events.map((event, i) => (
-                        <div key={event.id} className="card" style={{ marginBottom: '24px', display: 'flex', overflow: 'visible' }}>
-                            <div style={{
-                                width: '4px',
-                                background: 'var(--primary)',
-                                borderRadius: '4px 0 0 4px',
-                                flexShrink: 0,
-                            }} />
-                            <div className="card-body" style={{ padding: '28px 32px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px', flexWrap: 'wrap' }}>
-                                    <span className="badge badge-primary">{event.category}</span>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8125rem', color: 'var(--gray-400)' }}>
-                                        <Calendar size={14} />
-                                        {new Date(event.eventDate).toLocaleDateString('en-NG', { year: 'numeric', month: 'long', day: 'numeric' })}
-                                    </span>
-                                    {event.location && (
-                                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8125rem', color: 'var(--gray-400)' }}>
-                                            <MapPin size={14} />
-                                            {event.location}
-                                        </span>
-                                    )}
-                                </div>
-                                <h3 style={{ fontSize: '1.125rem', marginBottom: '8px' }}>{event.title}</h3>
-                                <p style={{ fontSize: '0.9375rem', color: 'var(--gray-500)', lineHeight: 1.6 }}>{event.description}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
-        </>
+        </div>
     );
 }

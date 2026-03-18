@@ -17,32 +17,45 @@ export default function AdminMediaPage() {
 
     useEffect(() => { fetchMedia(); }, []);
 
-    async function fetchMedia() {
-        try { const res = await fetch('/api/media'); setMedia(await res.json()); } catch { }
-        setLoading(false);
+    function fetchMedia() {
+        fetch('/api/media')
+            .then(res => res.json())
+            .then(data => setMedia(data))
+            .catch(() => { /* */ })
+            .finally(() => setLoading(false));
     }
 
-    async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
         const files = e.target.files;
         if (!files?.length) return;
         setUploading(true);
 
-        for (const file of Array.from(files)) {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('altText', file.name);
-            try { await fetch('/api/upload', { method: 'POST', body: formData }); } catch { }
-        }
+        const fileList = Array.from(files);
+        const uploadNext = (index: number) => {
+            if (index >= fileList.length) {
+                setUploading(false);
+                fetchMedia();
+                e.target.value = '';
+                return;
+            }
 
-        setUploading(false);
-        fetchMedia();
-        e.target.value = '';
+            const formData = new FormData();
+            formData.append('file', fileList[index]);
+            formData.append('altText', fileList[index].name);
+
+            fetch('/api/upload', { method: 'POST', body: formData })
+                .then(() => uploadNext(index + 1))
+                .catch(() => uploadNext(index + 1));
+        };
+
+        uploadNext(0);
     }
 
-    async function handleDelete(id: string) {
+    function handleDelete(id: string) {
         if (!confirm('Delete this image from Cloudinary and database?')) return;
-        await fetch(`/api/media/${id}`, { method: 'DELETE' });
-        fetchMedia();
+        fetch(`/api/media/${id}`, { method: 'DELETE' })
+            .then(() => fetchMedia())
+            .catch(() => { /* */ });
     }
 
     function copyUrl(url: string, id: string) {

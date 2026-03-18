@@ -19,14 +19,12 @@ export default function AdminSubscribersPage() {
         fetchSubs();
     }, []);
 
-    async function fetchSubs() {
-        try {
-            const res = await fetch('/api/newsletter');
-            setSubscribers(await res.json());
-        } catch {
-            // handle error
-        }
-        setLoading(false);
+    function fetchSubs() {
+        fetch('/api/newsletter')
+            .then(res => res.json())
+            .then(data => setSubscribers(data))
+            .catch(() => { /* */ })
+            .finally(() => setLoading(false));
     }
 
     const filtered = subscribers.filter(s =>

@@ -124,7 +124,7 @@ export default function AdminDashboard() {
                             <Users size={12} style={{ marginRight: '4px' }} />{stats?.leads || 0} Total
                         </span>
                     </div>
-                    {recentLeads.length > 0 ? (
+                    {Array.isArray(recentLeads) && recentLeads.length > 0 ? (
                         <table className="table" style={{ marginTop: '12px' }}>
                             <thead>
                                 <tr>
@@ -158,7 +158,7 @@ export default function AdminDashboard() {
                             <Mail size={12} style={{ marginRight: '4px' }} />{stats?.subscribers || 0} Total
                         </span>
                     </div>
-                    {recentSubscribers.length > 0 ? (
+                    {Array.isArray(recentSubscribers) && recentSubscribers.length > 0 ? (
                         <table className="table" style={{ marginTop: '12px' }}>
                             <thead>
                                 <tr>

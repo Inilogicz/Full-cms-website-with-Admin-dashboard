@@ -13,197 +13,138 @@ const fadeInUp = {
 
 export default function AboutPage() {
     return (
-        <>
-            {/* Hero Section */}
+        <div className="about-wrapper">
+            {/* Hero Section - Lightened */}
             <section style={{
                 paddingTop: '160px',
-                paddingBottom: '80px',
-                background: 'var(--gradient-hero)',
+                paddingBottom: '100px',
+                background: 'url(/contact.png)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
                 position: 'relative',
                 overflow: 'hidden'
             }}>
                 <div className="container" style={{ position: 'relative', zIndex: 2 }}>
                     <motion.div
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
+                        transition={{ duration: 0.8 }}
                         style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}
                     >
-                        <span className="section-label" style={{ color: 'var(--accent-light)' }}>About Us</span>
-                        <h1 style={{ color: 'var(--white)', marginBottom: '24px' }}>
-                            We Care About All Women and Girls
+                        <span className="section-label" style={{ color: 'var(--gold-dark)', fontWeight: 800 }}>Our Story</span>
+                        <h1 style={{ color: 'var(--primary-dark)', marginBottom: '24px', fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 900 }}>
+                            Redefining the <br />
+                            <span className="text-gradient-gold">Standard of Care</span>
                         </h1>
-                        <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '1.25rem', lineHeight: 1.6 }}>
-                            Our mission is to empower girls and women by unlocking their confidence with our quality products.
+                        <p style={{ color: 'var(--white)', fontSize: '1.25rem', lineHeight: 1.6, maxWidth: '640px', margin: '0 auto' }}>
+                            A heritage of excellence in manufacturing that empowers millions across West Africa.
                         </p>
                     </motion.div>
                 </div>
-                {/* Abstract background shape */}
+
+                {/* Subtle abstract background */}
                 <div style={{
                     position: 'absolute',
-                    top: '20%',
-                    right: '-10%',
-                    width: '500px',
-                    height: '500px',
-                    background: 'rgba(255,255,255,0.03)',
+                    top: '-10%',
+                    right: '-5%',
+                    width: '600px',
+                    height: '600px',
+                    background: 'radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%)',
                     borderRadius: '50%',
-                    filter: 'blur(100px)'
+                    filter: 'blur(80px)',
+                    zIndex: 1
                 }} />
             </section>
 
             {/* Main Content Section */}
-            <section className="section">
+            <section className="section" style={{ padding: '120px 0' }}>
                 <div className="container">
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 0.8fr)',
-                        gap: '64px',
+                        gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 0.9fr)',
+                        gap: '80px',
                         alignItems: 'center'
                     }} className="responsive-grid-2">
                         <motion.div {...fadeInUp}>
-                            <h2 style={{ marginBottom: '24px' }}>Niger Sanitary Industry Limited</h2>
-                            <p style={{ fontSize: '1.125rem', color: 'var(--gray-700)', marginBottom: '24px', fontWeight: 500 }}>
-                                A Nigerian registered premier Manufacturer of Sanitary Pads and Several other Medical Devices.
-                            </p>
-                            <div style={{ color: 'var(--gray-600)', lineHeight: 1.8, display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            <span style={{ color: 'var(--gold)', fontWeight: 800, fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '16px' }}>Legacy & Expertise</span>
+                            <h2 style={{ marginBottom: '24px', fontSize: '2.5rem', fontWeight: 900 }}>Nigeria's Premier <br />Healthcare Manufacturer</h2>
+                            <div style={{ color: 'var(--gray-600)', lineHeight: 1.8, display: 'flex', flexDirection: 'column', gap: '20px', fontSize: '1.0625rem' }}>
                                 <p>
-                                    Since its debut prior to the Country’s independence, the company prides itself with highly Hygienic, Natural and Human-Friendly products generally accepted and accessible in the Nigerian markets and the West Coast.
+                                    Niger Sanitary Industry Limited stands as a beacon of Nigerian manufacturing. Since its inception, the company has prided itself on delivering hygienic, human-friendly products across the West African sub-region.
                                 </p>
                                 <p>
-                                    The Direct and Indirect employees of the company are well over 5000 personnel. Over the years, the Company’s operational departments have been manned by Nigerians and expatriate staff.
+                                    With over <span style={{ color: 'var(--primary)', fontWeight: 800 }}>5,000 dedicated personnel</span>, we combine international expertise with deep local commitment to ensure quality healthcare is accessible to everyone.
                                 </p>
-                                <p>
-                                    Having the production capacity, personnel, quality and channels per degree over the years, the management recently resolved for a comprehensive expansion of product and brand lines.
-                                </p>
-                                <p>
-                                    With approximate reinvestments and engagement of well-motivated staff to attain set goals, the company and her workers look into the future with great optimism.
-                                </p>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '10px' }}>
+                                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                        <div style={{ color: 'var(--gold)' }}><Shield size={24} /></div>
+                                        <span style={{ fontWeight: 700, fontSize: '0.875rem' }}>NAFDAC Certified</span>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                        <div style={{ color: 'var(--gold)' }}><Award size={24} /></div>
+                                        <span style={{ fontWeight: 700, fontSize: '0.875rem' }}>ISO 9001:2015</span>
+                                    </div>
+                                </div>
                             </div>
                         </motion.div>
 
                         <motion.div {...fadeInUp} style={{ position: 'relative' }}>
-                            <div style={{
+                            <div className="glass-premium" style={{
                                 position: 'relative',
-                                borderRadius: 'var(--radius-xl)',
+                                borderRadius: 'var(--radius-2xl)',
                                 overflow: 'hidden',
-                                boxShadow: 'var(--shadow-xl)',
-                                aspectRatio: '1'
+                                boxShadow: '0 40px 100px -20px rgba(0,0,0,0.15)',
+                                aspectRatio: '1',
+                                border: '1px solid var(--gray-100)'
                             }}>
-                                <Image
-                                    src="/about-office.png"
-                                    alt="Niger Sanitary Office"
-                                    fill
-                                    style={{ objectFit: 'cover' }}
+                                <img
+                                    src="/logo.png"
+                                    alt="Niger Sanitary Manufacturing"
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                 />
-                            </div>
-                            {/* Floating experience card */}
-                            <div className="glass" style={{
-                                position: 'absolute',
-                                bottom: '-30px',
-                                left: '-30px',
-                                padding: '24px',
-                                borderRadius: 'var(--radius-lg)',
-                                maxWidth: '240px',
-                                boxShadow: 'var(--shadow-lg)'
-                            }}>
-                                <div style={{ fontWeight: 800, fontSize: '2rem', color: 'var(--primary)', lineHeight: 1 }}>5000+</div>
-                                <div style={{ fontSize: '0.875rem', color: 'var(--gray-600)', marginTop: '8px', fontWeight: 600 }}>
-                                    Dedicated Professionals
-                                </div>
                             </div>
                         </motion.div>
                     </div>
                 </div>
             </section>
 
-            {/* Product Benefits Section */}
-            <section className="section" style={{ background: 'var(--gray-50)' }}>
+            {/* Vision & Mission - Refined */}
+            <section className="section" style={{ background: 'var(--gray-50)', padding: '120px 0' }}>
                 <div className="container">
-                    <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-                        <h2 style={{ marginBottom: '16px' }}>Why Choose Our Products?</h2>
-                        <p style={{ color: 'var(--gray-500)', maxWidth: '600px', margin: '0 auto' }}>
-                            Engineered for excellence, designed for comfort.
-                        </p>
-                    </div>
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                        gap: '24px'
-                    }}>
-                        {[
-                            { title: 'Absorbs heaviest wettings', desc: 'Superior core technology for ultimate protection.' },
-                            { title: 'Comfortable feeling', desc: 'Soft-touch materials for all-day ease.' },
-                            { title: 'Well-designed shape', desc: 'Ergonomic contours that move with you.' },
-                            { title: 'Flexibility and freedom', desc: 'Unrestricted movement for your busy lifestyle.' },
-                            { title: 'Medical Endorsement', desc: 'Often recommended as part of the Hospital child delivery list.' }
-                        ].map((benefit, i) => (
-                            <motion.div
-                                key={benefit.title}
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.1 }}
-                                className="card"
-                                style={{ padding: '32px', textAlign: 'center' }}
-                            >
-                                <div style={{
-                                    width: 48,
-                                    height: 48,
-                                    borderRadius: '50%',
-                                    background: 'var(--primary-50)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    margin: '0 auto 16px',
-                                    color: 'var(--primary)'
-                                }}>
-                                    <CheckCircle size={24} />
-                                </div>
-                                <h3 style={{ fontSize: '1.125rem', marginBottom: '8px' }}>{benefit.title}</h3>
-                                <p style={{ fontSize: '0.875rem', color: 'var(--gray-500)' }}>{benefit.desc}</p>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Vision & Mission */}
-            <section className="section">
-                <div className="container">
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '64px', alignItems: 'center' }} className="responsive-grid-2">
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px', alignItems: 'center' }} className="responsive-grid-2">
                         <motion.div {...fadeInUp} style={{ order: 2 }}>
-                            <div style={{ marginBottom: '40px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                                    <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', background: 'var(--primary-50)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
-                                        <Eye size={20} />
+                            <div style={{ marginBottom: '48px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+                                    <div style={{ width: 44, height: 44, borderRadius: 'var(--radius-lg)', background: 'var(--gold-50)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gold)', border: '1px solid var(--gold-glow)' }}>
+                                        <Eye size={22} />
                                     </div>
-                                    <h2 style={{ fontSize: '1.75rem' }}>Our Vision</h2>
+                                    <h2 style={{ fontSize: '2rem', fontWeight: 900 }}>Our Vision</h2>
                                 </div>
                                 <p style={{ color: 'var(--gray-600)', lineHeight: 1.8, fontSize: '1.125rem' }}>
-                                    To be the Market Leader in the production and Distribution of Quality and Affordable Sanitary pads and proximate Medical Devices in Nigeria and the West Coast.
+                                    To be the undisputed market leader in the production and distribution of quality, affordable hygiene solutions across Africa.
                                 </p>
                             </div>
 
                             <div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                                    <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', background: 'var(--primary-50)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
-                                        <Target size={20} />
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+                                    <div style={{ width: 44, height: 44, borderRadius: 'var(--radius-lg)', background: 'var(--primary-50)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', border: '1px solid rgba(10, 77, 162, 0.1)' }}>
+                                        <Target size={22} />
                                     </div>
-                                    <h2 style={{ fontSize: '1.75rem' }}>Our Mission</h2>
+                                    <h2 style={{ fontSize: '2rem', fontWeight: 900 }}>Our Mission</h2>
                                 </div>
                                 <p style={{ color: 'var(--gray-600)', lineHeight: 1.8, fontSize: '1.125rem' }}>
-                                    To be the Market Leader in the production and Distribution of Quality and Affordable Sanitary pads and proximate Medical Devices in Nigeria and the West Coast.
+                                    We strive to empower individuals by delivering scientifically advanced healthcare products through sustainable manufacturing.
                                 </p>
                             </div>
                         </motion.div>
 
                         <motion.div {...fadeInUp} style={{ order: 1 }}>
-                            <div style={{ position: 'relative', borderRadius: 'var(--radius-xl)', overflow: 'hidden', boxShadow: 'var(--shadow-xl)', aspectRatio: '4/5' }}>
-                                <Image
-                                    src="/about-vision.png"
-                                    alt="Our Vision"
-                                    fill
-                                    style={{ objectFit: 'cover' }}
+                            <div style={{ position: 'relative', borderRadius: 'var(--radius-2xl)', overflow: 'hidden', boxShadow: '0 40px 80px rgba(0,0,0,0.1)', aspectRatio: '4/5' }}>
+                                <img
+                                    src="/product4.JPG"
+                                    alt="Leadership and Vision"
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                 />
                             </div>
                         </motion.div>
@@ -211,47 +152,55 @@ export default function AboutPage() {
                 </div>
             </section>
 
-            {/* Support & Puberty Section */}
-            <section className="section" style={{ background: 'var(--gray-900)', color: 'white' }}>
-                <div className="container">
-                    <div style={{ display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gap: '64px', alignItems: 'center' }} className="responsive-grid-2">
+            {/* Support & Puberty Section - Sleeker */}
+            <section className="section" style={{ background: 'var(--primary-dark)', color: 'white', overflow: 'hidden', position: 'relative', padding: '140px 0' }}>
+                <div style={{
+                    position: 'absolute',
+                    top: '-10%',
+                    left: '-5%',
+                    width: '500px',
+                    height: '500px',
+                    background: 'radial-gradient(circle, var(--gold), transparent)',
+                    opacity: 0.05,
+                    zIndex: 0
+                }} />
+
+                <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '0.9fr 1.1fr', gap: '80px', alignItems: 'center' }} className="responsive-grid-2">
                         <motion.div {...fadeInUp}>
-                            <div style={{ position: 'relative', borderRadius: 'var(--radius-xl)', overflow: 'hidden', aspectRatio: '4/3' }}>
-                                <Image
-                                    src="/about-care.png"
-                                    alt="We Care"
-                                    fill
-                                    style={{ objectFit: 'cover' }}
+                            <div style={{
+                                position: 'relative',
+                                borderRadius: 'var(--radius-2xl)',
+                                overflow: 'hidden',
+                                aspectRatio: '4/3',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                boxShadow: '0 30px 60px rgba(0,0,0,0.3)'
+                            }}>
+                                <img
+                                    src="/product7.JPG"
+                                    alt="Community Care"
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                 />
                             </div>
                         </motion.div>
                         <motion.div {...fadeInUp}>
-                            <h2 style={{ color: 'white', marginBottom: '24px' }}>Building Resilience & Confidence</h2>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                                <blockquote style={{
-                                    borderLeft: '4px solid var(--primary)',
-                                    paddingLeft: '24px',
-                                    fontSize: '1.25rem',
-                                    fontStyle: 'italic',
-                                    color: 'rgba(255,255,255,0.9)'
-                                }}>
-                                    "We ensure that no one loses confidence because of their gender or their period."
-                                </blockquote>
-                                <p style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.8, fontSize: '1.0625rem' }}>
-                                    We work hard to support young people going through puberty, where a combination of insecurities about their changing body, their first period and societal expectations can all contribute to a drop in self-confidence.
+                            <span style={{ color: 'var(--gold)', fontWeight: 800, fontSize: '0.875rem', textTransform: 'uppercase', letterSpacing: '0.2em', display: 'block', marginBottom: '20px' }}>Our Commitment</span>
+                            <h2 style={{ color: 'white', marginBottom: '24px', fontSize: '2.5rem', fontWeight: 900 }}>Resilience & Confidence</h2>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                                <p style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.8, fontSize: '1.125rem' }}>
+                                    We believe that personal hygiene is a fundamental right. Our products are designed to support girls and women through all stages of life, ensuring confidence remains unshakable.
                                 </p>
+                                <div style={{ borderLeft: '4px solid var(--gold)', paddingLeft: '24px' }}>
+                                    <p style={{ fontStyle: 'italic', fontSize: '1.25rem', color: 'rgba(255,255,255,0.9)', fontWeight: 500 }}>
+                                        "Quality care that respects dignity and empowers potential."
+                                    </p>
+                                </div>
                             </div>
                         </motion.div>
                     </div>
                 </div>
             </section>
 
-            <style jsx>{`
-                @media (max-width: 768px) {
-                    .responsive-grid-2 { grid-template-columns: 1fr !important; gap: 40px !important; }
-                    .card { padding: 24px !important; }
-                }
-            `}</style>
-        </>
+        </div>
     );
 }

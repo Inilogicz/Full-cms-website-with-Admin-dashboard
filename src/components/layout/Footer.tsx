@@ -1,13 +1,27 @@
+'use client';
+
 import Link from 'next/link';
 import { Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Footer() {
     return (
         <footer style={{
             background: 'var(--gray-900)',
-            color: 'var(--gray-300)',
-            paddingTop: '64px',
+            color: 'var(--gray-400)',
+            paddingTop: '80px',
+            borderTop: '4px solid var(--gold)',
+            position: 'relative',
         }}>
+            <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '1px',
+                background: 'linear-gradient(to right, transparent, var(--gold), transparent)',
+                opacity: 0.3
+            }} />
             <div className="container">
                 {/* Main Footer */}
                 <div style={{
@@ -25,22 +39,9 @@ export default function Footer() {
                             gap: '10px',
                             marginBottom: '16px',
                         }}>
-                            <div style={{
-                                width: 36,
-                                height: 36,
-                                borderRadius: 'var(--radius-md)',
-                                background: 'var(--primary)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: 'white',
-                                fontWeight: 900,
-                                fontSize: '0.875rem',
-                            }}>
-                                NS
-                            </div>
-                            <span style={{ fontWeight: 700, color: 'var(--white)', fontSize: '1.125rem' }}>
-                                Niger Sanitary
+                           <Image src="/logo.png" alt="Logo" width={42} height={42} style={{ filter: 'brightness(0) invert(1)' }}/>
+                            <span style={{ fontWeight: 800, color: 'var(--white)', fontSize: '1.25rem', letterSpacing: '-0.02em' }}>
+                                Niger<span style={{ color: 'var(--gold)' }}>Sanitary</span>
                             </span>
                         </div>
                         <p style={{ fontSize: '0.875rem', lineHeight: 1.7, marginBottom: '20px' }}>
@@ -107,15 +108,15 @@ export default function Footer() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                             <div style={{ display: 'flex', gap: '12px', fontSize: '0.875rem' }}>
                                 <MapPin size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
-                                <span>Niger State, Nigeria</span>
+                                <span>No 1 Damson street, off Akilo Road, ogba industrial scheme, Lagos, Nigeria.</span>
                             </div>
                             <div style={{ display: 'flex', gap: '12px', fontSize: '0.875rem' }}>
                                 <Phone size={18} style={{ flexShrink: 0 }} />
-                                <span>+234 800 000 0000</span>
+                                <span>+234 906 8704 615</span>
                             </div>
                             <div style={{ display: 'flex', gap: '12px', fontSize: '0.875rem' }}>
                                 <Mail size={18} style={{ flexShrink: 0 }} />
-                                <span>info@nigersanitary.com</span>
+                                <span>nigersanitaryindustrylimited@ymail.com</span>
                             </div>
                         </div>
                     </div>
@@ -131,13 +132,14 @@ export default function Footer() {
                     flexWrap: 'wrap',
                     gap: '12px',
                 }}>
-                    <p>© {new Date().getFullYear()} Niger Sanitary Industry Limited. All rights reserved.</p>
-                    <div style={{ display: 'flex', gap: '24px' }}>
-                        <Link href="/trust">Trust & Compliance</Link>
-                        <Link href="/faq">FAQ</Link>
+                    <p style={{ color: 'var(--gray-500)' }}>© {new Date().getFullYear()} Niger Sanitary Industry Limited. All rights reserved.</p>
+                    <div style={{ display: 'flex', gap: '32px' }}>
+                        <Link href="/trust" className="hover-gold">Trust & Compliance</Link>
+                        <Link href="/faq" className="hover-gold">FAQ</Link>
                     </div>
                 </div>
             </div>
+
         </footer>
     );
 }

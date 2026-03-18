@@ -30,6 +30,9 @@ export async function PUT(req: NextRequest, context: RouteContext) {
                 applications: data.applications,
                 packaging: data.packaging,
                 status: data.status,
+                images: data.imageIds ? {
+                    set: data.imageIds.map((id: string) => ({ id }))
+                } : undefined
             },
         });
         return NextResponse.json(product);

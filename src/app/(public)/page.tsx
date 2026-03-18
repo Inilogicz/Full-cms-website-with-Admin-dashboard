@@ -1,7 +1,8 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
   Shield,
@@ -13,7 +14,48 @@ import {
   Star,
   TrendingUp,
   CheckCircle,
+  Play,
+  Globe,
+  Truck,
+  Zap,
 } from 'lucide-react';
+
+// Custom Crafted Icons
+const CraftedShield = () => (
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M9 12L11 14L15 10" stroke="var(--gold)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const CraftedZap = () => (
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="url(#zapGradient)" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" />
+    <defs>
+      <linearGradient id="zapGradient" x1="3" y1="2" x2="21" y2="22" gradientUnits="userSpaceOnUse">
+        <stop stopColor="var(--gold)" />
+        <stop offset="1" stopColor="var(--gold-dark)" />
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+const CraftedGlobe = () => (
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
+    <path d="M2 12H22" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" />
+    <path d="M12 2C14.501 4.501 16 8.163 16 12C16 15.837 14.501 19.499 12 22C9.499 19.499 8 15.837 8 12C8 8.163 9.499 4.501 12 2Z" stroke="var(--gold)" strokeWidth="1.5" />
+  </svg>
+);
+
+const CraftedUsers = () => (
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.5" />
+    <path d="M23 21V19C22.9993 18.1137 22.7044 17.2524 22.1614 16.5523C21.6184 15.8522 20.8581 15.3516 20 15.13" stroke="var(--gold)" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25393 19.0078 6.11683 19.0078 7.005C19.0078 7.89317 18.7122 8.75607 18.1676 9.45768C17.623 10.1593 16.8604 10.6597 16 10.88" stroke="var(--gold)" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -22,603 +64,444 @@ const fadeInUp = {
   transition: { duration: 0.6 },
 };
 
-const staggerContainer = {
-  initial: {},
-  whileInView: { transition: { staggerChildren: 0.1 } },
-  viewport: { once: true },
-};
-
-const products = [
-  {
-    name: 'LadySept Sanitary Towels',
-    description: 'Premium quality sanitary pads for maximum comfort and protection.',
-    category: 'Feminine Care',
-    slug: 'ladysept-sanitary-towels',
-    color: '#E3F2FD',
-    icon: '🩹',
-  },
-  {
-    name: 'Damson Serviette',
-    description: 'Soft, absorbent serviettes for everyday hygiene needs.',
-    category: 'Hygiene',
-    slug: 'damson-serviette',
-    color: '#F0F7FF',
-    icon: '🧻',
-  },
-  {
-    name: 'Absorbent Cotton Wool',
-    description: 'Medical-grade cotton wool for healthcare and personal care.',
-    category: 'Medical',
-    slug: 'absorbent-cotton-wool',
-    color: '#E8F5E9',
-    icon: '🏥',
-  },
-  {
-    name: 'Damson Underpad',
-    description: 'High-absorbency underpads for patient care and hygiene.',
-    category: 'Medical',
-    slug: 'damson-underpad',
-    color: '#FFF3E0',
-    icon: '🛏️',
-  },
-];
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  category: string;
+  images: { cloudinaryUrl: string }[];
+}
 
 const stats = [
-  { value: '20+', label: 'Years of Excellence', icon: TrendingUp },
-  { value: '100M+', label: 'Products Manufactured', icon: Factory },
-  { value: '5,000+', label: 'Distribution Points', icon: Users },
-  { value: '100%', label: 'Quality Certified', icon: Award },
+  { value: '25+', label: 'Years of Trust', icon: CraftedShield, color: 'var(--gold)', desc: 'Consistent quality and reliability since 1999.' },
+  { value: '150M+', label: 'Monthly Output', icon: CraftedZap, color: 'var(--primary)', desc: 'High-speed production at our modern facility.' },
+  { value: '12', label: 'West African Markets', icon: CraftedGlobe, color: 'var(--accent)', desc: 'Expanding our reach across the ECOWAS region.' },
+  { value: '10k+', label: 'Skilled Workforce', icon: CraftedUsers, color: 'var(--success)', desc: 'Dedicated team committed to excellence.' },
 ];
 
 const features = [
   {
     icon: Shield,
     title: 'NAFDAC Approved',
-    description: 'All products meet stringent regulatory standards and carry NAFDAC registration.',
+    description: 'All products meet stringent regulatory standards.',
   },
   {
     icon: Award,
     title: 'ISO Certified',
-    description: 'Manufacturing processes certified under international quality management standards.',
+    description: 'Certified under international management standards.',
   },
   {
     icon: Factory,
-    title: 'State-of-the-Art Factory',
-    description: 'Modern production lines equipped with latest manufacturing technology.',
+    title: 'Modern Factory',
+    description: 'Equipped with latest manufacturing technology.',
   },
   {
     icon: Heart,
     title: 'Community Impact',
-    description: 'Active CSR programs promoting menstrual health education across Nigeria.',
+    description: 'Promoting education across Nigeria.',
   },
 ];
 
 export default function HomePage() {
+  const [fetchedProducts, setFetchedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { scrollY } = useScroll();
+  const y1 = useTransform(scrollY, [0, 500], [0, 150]);
+  const opacity = useTransform(scrollY, [0, 200], [1, 0]);
+
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const res = await fetch('/api/products');
+        const data = await res.json();
+        // Limit to 4 products for homepage
+        if (Array.isArray(data)) {
+          setFetchedProducts(data.slice(0, 4));
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProducts();
+  }, []);
+
   return (
-    <>
-      {/* Hero Section */}
+    <div className="homepage-wrapper">
+      {/* Hero Section - Lightened */}
       <section style={{
         position: 'relative',
-        minHeight: '100vh',
+        minHeight: '90vh',
         display: 'flex',
         alignItems: 'center',
         paddingTop: '80px',
-        background: 'var(--white)',
+        background: 'linear-gradient(to bottom, #f8faff 0%, #ffffff 100%)',
         overflow: 'hidden',
       }}>
-        {/* Background Visuals */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          width: '55%',
-          height: '100%',
-          zIndex: 1,
-        }} className="hero-image-container">
-          <div style={{
+        {/* Background layer with lower opacity for "airy" feel */}
+        <motion.div
+          style={{
             position: 'absolute',
             inset: 0,
-            background: 'var(--gradient-hero)',
+            // backgroundImage: "url('/premium_abstract_blue_gold_bg.png')",
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            opacity: 0.9,
-          }} />
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(to right, var(--white) 0%, transparent 20%, transparent 80%, rgba(10, 77, 162, 0.1) 100%)',
-          }} />
-        </div>
+            opacity: 0.75, // Reduced opacity
+            y: y1,
+          }}
+        />
+
+        {/* Lighter overlays */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 1) 100%)',
+          zIndex: 1,
+        }} />
 
         <div className="container" style={{ position: 'relative', zIndex: 10 }}>
           <div style={{
             display: 'grid',
-            gridTemplateColumns: '1.2fr 0.8fr',
+            gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 0.8fr)',
             gap: '40px',
             alignItems: 'center',
           }}>
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, ease: 'easeOut' }}
+              transition={{ duration: 0.8 }}
             >
-              <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                background: 'var(--primary-50)',
-                borderRadius: 'var(--radius-full)',
-                padding: '6px 16px',
-                marginBottom: '24px',
-                color: 'var(--primary)',
-                fontWeight: 600,
-                fontSize: '0.8125rem',
-                letterSpacing: '0.05em',
-                textTransform: 'uppercase',
-              }}>
-                <Star size={14} fill="var(--primary)" />
-                Nigeria&apos;s Healthcare Manufacturing Leader
-              </div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'var(--gold-50)',
+                  borderRadius: 'var(--radius-full)',
+                  padding: '6px 16px',
+                  marginBottom: '24px',
+                  color: 'var(--gold-dark)',
+                  fontWeight: 700,
+                  fontSize: '0.75rem',
+                  border: '1px solid rgba(212, 175, 55, 0.2)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}
+              >
+                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--gold)' }} />
+                Premium Healthcare Leader
+              </motion.div>
 
               <h1 style={{
-                fontSize: 'clamp(2.5rem, 6vw, 4.25rem)',
+                fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
                 fontWeight: 900,
-                lineHeight: 1.05,
-                marginBottom: '24px',
-                letterSpacing: '-0.03em',
-                color: 'var(--gray-900)',
+                lineHeight: 1.1,
+                marginBottom: '20px',
+                color: 'var(--primary-dark)',
               }}>
-                Excellence in <br />
-                <span style={{
-                  background: 'var(--gradient-primary)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}>
-                  Hygiene & Care
-                </span>
+                Redefining <br />
+                <span className="text-gradient-gold">Standard of Care</span>
               </h1>
 
               <p style={{
                 color: 'var(--gray-600)',
-                fontSize: '1.1875rem',
+                fontSize: '1.125rem',
                 lineHeight: 1.6,
                 marginBottom: '40px',
-                maxWidth: '540px',
+                maxWidth: '560px',
               }}>
-                Niger Sanitary Industry Limited manufactures premium quality sanitary towels, medical consumables, and hygiene products trusted by millions across West Africa.
+                Manufacturing excellence that empowers millions. Quality solutions delivered with integrity and local commitment.
               </p>
 
               <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                <Link href="/products" className="btn btn-lg btn-primary" style={{ minWidth: '200px' }}>
-                  Our Products
-                  <ArrowRight size={18} />
+                <Link href="/products" className="btn btn-lg" style={{
+                  background: 'var(--gradient-gold)',
+                  color: 'white',
+                  padding: '16px 40px',
+                  borderRadius: 'var(--radius-full)',
+                  boxShadow: '0 8px 24px var(--gold-glow)'
+                }}>
+                  Explore Catalogue
                 </Link>
-                <Link href="/distributor" className="btn btn-lg btn-secondary" style={{ minWidth: '200px' }}>
-                  Distributor Portal
+                <Link href="/about" className="btn btn-lg btn-secondary" style={{
+                  borderRadius: 'var(--radius-full)',
+                  background: 'transparent',
+                  border: '1.5px solid var(--gray-200)',
+                  color: 'var(--gray-700)'
+                }}>
+                  Our Heritage
                 </Link>
-              </div>
-
-              {/* Trust Indicators */}
-              <div style={{
-                marginTop: '56px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '32px',
-                opacity: 0.7,
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', fontWeight: 600 }}>
-                  <Shield size={20} className="text-primary" /> NAFDAC Certified
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', fontWeight: 600 }}>
-                  <CheckCircle size={20} className="text-primary" /> ISO Compliant
-                </div>
               </div>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="hero-card-container"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="hero-media-container"
             >
-              <div className="glass" style={{
-                borderRadius: 'var(--radius-xl)',
-                padding: '32px',
-                maxWidth: '380px',
-                marginLeft: 'auto',
-                boxShadow: 'var(--shadow-xl)',
-              }}>
+              <div style={{ position: 'relative', padding: '10px' }}>
                 <div style={{
-                  width: '48px',
-                  height: '48px',
-                  background: 'var(--white)',
-                  borderRadius: 'var(--radius-md)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '20px',
-                  color: 'var(--primary)',
+                  borderRadius: 'var(--radius-xl)',
+                  overflow: 'hidden',
+                  aspectRatio: '1',
+                  boxShadow: '0 40px 100px -20px rgba(10, 77, 162, 0.15)',
+                  border: '8px solid white',
+                  background: 'white'
                 }}>
-                  <Factory size={24} />
+                  <img src="/hero.png" alt="Facility" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
-                <h3 style={{ fontSize: '1.25rem', marginBottom: '12px', color: 'var(--gray-900)' }}>Modern Facility</h3>
-                <p style={{ fontSize: '0.9375rem', color: 'var(--gray-600)', marginBottom: '0' }}>
-                  Our state-of-the-art production lines in Niger State utilize the latest technology to ensure international quality standards.
-                </p>
+
+                {/* Floating Badge - Sleeker */}
+                <motion.div
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                  style={{
+                    position: 'absolute',
+                    top: '-10%',
+                    right: '-5%',
+                    background: 'white',
+                    padding: '16px 24px',
+                    borderRadius: 'var(--radius-lg)',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                    zIndex: 10,
+                    border: '1px solid var(--gray-50)'
+                  }}
+                >
+                  <div style={{ color: 'var(--gold-dark)', fontWeight: 900, fontSize: '1.5rem' }}>100M+</div>
+                  <div style={{ fontSize: '0.625rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--gray-400)', letterSpacing: '0.1em' }}>Units Yearly</div>
+                </motion.div>
               </div>
             </motion.div>
           </div>
         </div>
-
-        <style jsx>{`
-          @media (max-width: 1024px) {
-            section { min-height: auto !important; padding: 140px 0 80px !important; }
-            .hero-image-container { width: 100% !important; opacity: 0.15 !important; }
-            section > .container > div { grid-template-columns: 1fr !important; }
-            .hero-card-container { display: none !important; }
-          }
-          @media (min-width: 1025px) {
-            .hero-image-container { clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%); }
-          }
-        `}</style>
       </section>
 
-
-      {/* Stats Bar */}
-      <section style={{
-        background: 'var(--white)',
-        borderBottom: '1px solid var(--gray-100)',
-        padding: '0',
-      }}>
+      {/* Stats Cards - Sleeker & More Compact */}
+      <section style={{ padding: '0 0 80px', background: 'var(--white)' }}>
         <div className="container">
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '1px',
-            background: 'var(--gray-100)',
-            margin: '0 -24px',
+            gap: '20px',
+            marginTop: '-25px',
+            position: 'relative',
+            zIndex: 20
           }}>
             {stats.map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                style={{
-                  padding: '32px 24px',
-                  textAlign: 'center',
-                  background: 'var(--white)',
-                }}
-              >
-                <stat.icon size={24} style={{ color: 'var(--primary)', marginBottom: '8px' }} />
-                <div style={{
-                  fontSize: 'clamp(1.5rem, 3vw, 2rem)',
-                  fontWeight: 800,
-                  color: 'var(--gray-900)',
-                  marginBottom: '4px',
-                }}>
-                  {stat.value}
-                </div>
-                <div style={{ fontSize: '0.875rem', color: 'var(--gray-500)' }}>
-                  {stat.label}
-                </div>
-              </motion.div>
+              <div key={stat.label} className="perspective-1000 group" style={{ height: '180px' }}>
+                <motion.div
+                  className="preserve-3d relative w-full h-full duration-700 transition-transform"
+                  whileHover={{ rotateY: 180 }}
+                  style={{ transformStyle: 'preserve-3d' }}
+                >
+                  {/* Front Side */}
+                  <div className="backface-hidden absolute inset-0 w-full h-full" style={{ backfaceVisibility: 'hidden' }}>
+                    <div className="stat-card-refined" style={{
+                      background: 'white',
+                      height: '100%',
+                      padding: '28px 20px',
+                      borderRadius: 'var(--radius-xl)',
+                      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.04)',
+                      border: '1px solid var(--gray-100)',
+                      textAlign: 'center',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      ['--accent-color' as string]: stat.color
+                    } as any}>
+                      <div style={{
+                        color: stat.color,
+                        marginBottom: '12px',
+                        display: 'flex',
+                        justifyContent: 'center'
+                      }} className="stat-icon-box">
+                        {(() => {
+                          const Icon = stat.icon;
+                          return <Icon />;
+                        })()}
+                      </div>
+                      <div style={{ fontSize: '1.75rem', fontWeight: 900, color: 'var(--gray-900)', marginBottom: '4px' }}>{stat.value}</div>
+                      <div style={{ fontSize: '0.625rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--gray-400)', letterSpacing: '0.05em' }}>{stat.label}</div>
+                    </div>
+                  </div>
+
+                  {/* Back Side */}
+                  <div className="backface-hidden rotate-y-180 absolute inset-0 w-full h-full" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
+                    <div style={{
+                      background: 'var(--primary-dark)',
+                      height: '100%',
+                      borderRadius: 'var(--radius-xl)',
+                      padding: '24px 16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      color: 'white',
+                      textAlign: 'center'
+                    }}>
+                      <p style={{ fontSize: '0.75rem', opacity: 0.9, lineHeight: 1.5, fontWeight: 500 }}>{stat.desc}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Featured Products */}
+      {/* Products - With Flip Animation */}
       <section className="section" style={{ background: 'var(--gray-50)' }}>
         <div className="container">
-          <motion.div {...fadeInUp}>
-            <span className="section-label">Our Products</span>
-            <h2 className="section-title">Quality You Can Trust</h2>
-            <p className="section-subtitle">
-              From sanitary pads to medical consumables, every product is crafted with precision and care in our state-of-the-art facility.
-            </p>
-          </motion.div>
+          <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+            <span className="section-label">Our Range</span>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: 900 }}>High-Performance Products</h2>
+          </div>
 
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
             gap: '24px',
           }}>
-            {products.map((product, i) => (
-              <motion.div
-                key={product.slug}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <Link href={`/products/${product.slug}`} style={{ display: 'block' }}>
-                  <div className="card" style={{ height: '100%' }}>
+            {loading ? (
+              // Skeleton Loader
+              [1, 2, 3, 4].map((i) => (
+                <div key={i} className="skeleton-card" style={{ height: '360px', borderRadius: 'var(--radius-xl)', background: 'var(--gray-100)' }} />
+              ))
+            ) : fetchedProducts.map((product, i) => (
+              <div key={product.slug} className="perspective-1000 group" style={{ height: '360px' }}>
+                <motion.div
+                  className="preserve-3d relative w-full h-full duration-700 transition-transform"
+                  whileHover={{ rotateY: 180 }}
+                  style={{ transformStyle: 'preserve-3d' }}
+                >
+                  {/* Front Side */}
+                  <div className="backface-hidden absolute inset-0 w-full h-full" style={{ backfaceVisibility: 'hidden' }}>
                     <div style={{
-                      background: product.color,
-                      padding: '40px',
+                      background: 'white',
+                      height: '100%',
+                      borderRadius: 'var(--radius-xl)',
+                      padding: '24px',
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '64px',
+                      flexDirection: 'column',
+                      border: '1px solid var(--gray-100)',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
                     }}>
-                      {product.icon}
-                    </div>
-                    <div className="card-body">
-                      <span className="badge badge-primary" style={{ marginBottom: '12px' }}>
-                        {product.category}
-                      </span>
-                      <h3 style={{ fontSize: '1.125rem', marginBottom: '8px' }}>
-                        {product.name}
-                      </h3>
-                      <p style={{ fontSize: '0.875rem', color: 'var(--gray-500)', marginBottom: '16px' }}>
-                        {product.description}
-                      </p>
-                      <span style={{
-                        display: 'inline-flex',
+                      <div style={{
+                        background: 'var(--gray-50)',
+                        borderRadius: 'var(--radius-lg)',
+                        height: '180px',
+                        display: 'flex',
                         alignItems: 'center',
-                        gap: '6px',
-                        color: 'var(--primary)',
-                        fontWeight: 600,
-                        fontSize: '0.875rem',
+                        justifyContent: 'center',
+                        marginBottom: '20px',
+                        overflow: 'hidden'
                       }}>
-                        Learn More <ChevronRight size={16} />
-                      </span>
+                        {product.images?.[0]?.cloudinaryUrl ? (
+                          <img
+                            src={product.images[0].cloudinaryUrl}
+                            alt={product.name}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          />
+                        ) : (
+                          <div style={{ fontSize: '48px', opacity: 0.2 }}>📦</div>
+                        )}
+                      </div>
+                      <h3 style={{ fontSize: '1.125rem', fontWeight: 800, marginBottom: '8px' }}>{product.name}</h3>
+                      <p style={{
+                        fontSize: '0.8125rem',
+                        color: 'var(--gray-500)',
+                        lineHeight: 1.5,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden'
+                      }}>{product.description}</p>
+                      <div style={{ marginTop: 'auto', textAlign: 'right', color: 'var(--gold)', fontSize: '0.75rem', fontWeight: 700 }}>Flip for spec <ArrowRight size={14} style={{ display: 'inline' }} /></div>
                     </div>
                   </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
 
-          <div style={{ textAlign: 'center', marginTop: '40px' }}>
-            <Link href="/products" className="btn btn-primary">
-              View All Products <ArrowRight size={16} />
-            </Link>
+                  {/* Back Side */}
+                  <div className="backface-hidden rotate-y-180 absolute inset-0 w-full h-full" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
+                    <div style={{
+                      background: 'var(--primary-dark)',
+                      height: '100%',
+                      borderRadius: 'var(--radius-xl)',
+                      padding: '32px 24px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      color: 'white',
+                      textAlign: 'center'
+                    }}>
+                      <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '16px', color: 'var(--gold)' }}>Quick Specs</h3>
+                      <ul style={{ listStyle: 'none', padding: 0, fontSize: '0.875rem', marginBottom: '24px' }}>
+                        <li style={{ marginBottom: '8px', opacity: 0.8 }}>• ISO Certified Production</li>
+                        <li style={{ marginBottom: '8px', opacity: 0.8 }}>• 100% Skin Friendly</li>
+                        <li style={{ marginBottom: '8px', opacity: 0.8 }}>• High Absorbency Core</li>
+                      </ul>
+                      <Link href={`/products/${product.slug}`} className="btn btn-sm" style={{ background: 'var(--gold)', color: 'white', alignSelf: 'center' }}>
+                        View Detail
+                      </Link>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* About Preview */}
-      <section className="section">
+      {/* Refined Content Sections */}
+      <section className="section" style={{ background: 'white', padding: '100px 0' }}>
         <div className="container">
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '64px',
-            alignItems: 'center',
-          }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'center' }}>
             <motion.div {...fadeInUp}>
-              <div style={{
-                position: 'relative',
-                borderRadius: 'var(--radius-xl)',
-                overflow: 'hidden',
-                aspectRatio: '4/3',
-                background: 'var(--gradient-primary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
-                <div style={{
-                  fontSize: '120px',
-                  opacity: 0.3,
-                }}>
-                  🏭
-                </div>
-                <div style={{
-                  position: 'absolute',
-                  bottom: '24px',
-                  left: '24px',
-                  right: '24px',
-                  background: 'rgba(255,255,255,0.15)',
-                  backdropFilter: 'blur(20px)',
-                  borderRadius: 'var(--radius-lg)',
-                  padding: '20px',
-                  color: 'white',
-                }}>
-                  <div style={{ fontWeight: 700, fontSize: '1.125rem', marginBottom: '4px' }}>
-                    Manufacturing Excellence
-                  </div>
-                  <div style={{ fontSize: '0.875rem', opacity: 0.9 }}>
-                    Modern production facility in Niger State, Nigeria
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div {...fadeInUp}>
-              <span className="section-label">About Us</span>
-              <h2 style={{ marginBottom: '20px' }}>
-                Pioneering Healthcare Manufacturing in Nigeria
-              </h2>
-              <p style={{
-                color: 'var(--gray-600)',
-                fontSize: '1.0625rem',
-                lineHeight: 1.7,
-                marginBottom: '24px',
-              }}>
-                Niger Sanitary Industry Limited is at the forefront of sanitary product manufacturing
-                in West Africa. With decades of experience and a commitment to quality, we produce
-                essential healthcare products that improve the lives of millions.
-              </p>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
-                {[
-                  'NAFDAC approved manufacturing facility',
-                  'ISO certified quality management',
-                  'State-of-the-art production technology',
-                  'Commitment to women\'s health education',
-                ].map((item) => (
-                  <div key={item} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <CheckCircle size={20} style={{ color: 'var(--success)', flexShrink: 0 }} />
-                    <span style={{ fontSize: '0.9375rem', color: 'var(--gray-700)' }}>{item}</span>
+              <span className="section-label">Manufacturing</span>
+              <h2 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '20px' }}>Precision Engineering <br /><span className="text-gold">Sustainable Production</span></h2>
+              <p style={{ color: 'var(--gray-600)', marginBottom: '32px', fontSize: '1rem' }}>Our ultra-modern facility in Niger State utilizes automated systems to ensure every product meets pharmaceutical-grade hygiene standards.</p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                {features.map((f, i) => (
+                  <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                    <div style={{ color: 'var(--gold)', padding: '4px' }}><f.icon size={20} /></div>
+                    <div>
+                      <div style={{ fontWeight: 800, fontSize: '0.875rem' }}>{f.title}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--gray-500)', lineHeight: 1.3 }}>{f.description}</div>
+                    </div>
                   </div>
                 ))}
               </div>
-
-              <Link href="/about" className="btn btn-primary">
-                Our Story <ArrowRight size={16} />
-              </Link>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              className="glass-premium"
+              style={{ position: 'relative', borderRadius: 'var(--radius-xl)', overflow: 'hidden', aspectRatio: '4/3' }}
+            >
+              <img src="/hero-bg.jpg" alt="Facility" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,77,162,0.4), transparent)' }} />
             </motion.div>
           </div>
         </div>
-
-        <style jsx>{`
-          @media (max-width: 768px) {
-            section > .container > div {
-              grid-template-columns: 1fr !important;
-            }
-          }
-        `}</style>
       </section>
 
-      {/* Why Choose Us */}
-      <section className="section" style={{ background: 'var(--gray-50)' }}>
-        <div className="container">
-          <motion.div {...fadeInUp}>
-            <span className="section-label">Why Choose Us</span>
-            <h2 className="section-title">Manufacturing Excellence</h2>
-            <p className="section-subtitle">
-              We combine international standards with local expertise to deliver products you can trust.
-            </p>
-          </motion.div>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-            gap: '24px',
-          }}>
-            {features.map((feature, i) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <div className="card" style={{ height: '100%' }}>
-                  <div className="card-body" style={{ padding: '32px' }}>
-                    <div style={{
-                      width: '52px',
-                      height: '52px',
-                      borderRadius: 'var(--radius-lg)',
-                      background: 'var(--primary-50)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginBottom: '20px',
-                    }}>
-                      <feature.icon size={24} style={{ color: 'var(--primary)' }} />
-                    </div>
-                    <h3 style={{ fontSize: '1.125rem', marginBottom: '10px' }}>
-                      {feature.title}
-                    </h3>
-                    <p style={{ fontSize: '0.9375rem', color: 'var(--gray-500)', lineHeight: 1.6 }}>
-                      {feature.description}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+      {/* CTA - More Sleek */}
+      <section style={{ padding: '100px 0', background: 'var(--primary-dark)', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: '-10%', right: '-5%', width: '400px', height: '400px', background: 'radial-gradient(circle, var(--gold), transparent)', opacity: 0.05 }} />
+        <div className="container" style={{ position: 'relative', textAlign: 'center' }}>
+          <h2 style={{ color: 'white', fontSize: '2.5rem', fontWeight: 900, marginBottom: '16px' }}>Ready to partner?</h2>
+          <p style={{ color: 'rgba(255,255,255,0.7)', maxWidth: '500px', margin: '0 auto 40px' }}>Join our growing network of distributors across West Africa and bring quality healthcare to your community.</p>
+          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+            <Link href="/distributor" className="btn btn-lg" style={{ background: 'var(--gold)', color: 'white' }}>Become a Partner</Link>
+            <Link href="/contact" className="btn btn-lg" style={{ border: '2.5px solid rgba(255,255,255,0.1)', color: 'white' }}>Contact Sales</Link>
           </div>
         </div>
       </section>
 
-      {/* Distributor CTA */}
-      <section style={{
-        background: 'var(--gradient-primary)',
-        padding: '80px 0',
-        position: 'relative',
-        overflow: 'hidden',
-      }}>
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: `radial-gradient(circle at 30% 50%, rgba(255,255,255,0.05) 0%, transparent 50%)`,
-        }} />
-        <div className="container" style={{ position: 'relative', textAlign: 'center' }}>
-          <motion.div {...fadeInUp}>
-            <h2 style={{ color: 'var(--white)', marginBottom: '16px' }}>
-              Become a Distribution Partner
-            </h2>
-            <p style={{
-              color: 'rgba(255,255,255,0.8)',
-              fontSize: '1.125rem',
-              maxWidth: '560px',
-              margin: '0 auto 36px',
-              lineHeight: 1.7,
-            }}>
-              Join our growing network of distributors across Nigeria and West Africa.
-              Partner with a trusted brand that delivers quality and value.
-            </p>
-            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link href="/distributor" className="btn btn-lg" style={{
-                background: 'var(--white)',
-                color: 'var(--primary)',
-                fontWeight: 700,
-              }}>
-                Apply Now <ArrowRight size={18} />
-              </Link>
-              <Link href="/products" className="btn btn-lg" style={{
-                background: 'transparent',
-                color: 'var(--white)',
-                border: '2px solid rgba(255,255,255,0.3)',
-              }}>
-                View Products
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Newsletter */}
-      <section className="section">
-        <div className="container" style={{ maxWidth: '640px', textAlign: 'center' }}>
-          <motion.div {...fadeInUp}>
-            <span className="section-label">Stay Updated</span>
-            <h2 className="section-title">Subscribe to Our Newsletter</h2>
-            <p className="section-subtitle">
-              Get the latest updates on our products, events, and health education resources.
-            </p>
-            <form style={{
-              display: 'flex',
-              gap: '12px',
-              maxWidth: '480px',
-              margin: '0 auto',
-            }}
-              onSubmit={async (e) => {
-                e.preventDefault();
-                const form = e.currentTarget;
-                const email = (form.elements.namedItem('email') as HTMLInputElement).value;
-                try {
-                  await fetch('/api/newsletter', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email }),
-                  });
-                  alert('Thank you for subscribing!');
-                  form.reset();
-                } catch {
-                  alert('Something went wrong. Please try again.');
-                }
-              }}
-            >
-              <input
-                name="email"
-                type="email"
-                placeholder="Enter your email"
-                className="form-input"
-                required
-                style={{ flex: 1 }}
-              />
-              <button type="submit" className="btn btn-primary">
-                Subscribe
-              </button>
-            </form>
-          </motion.div>
-        </div>
-      </section>
-    </>
+    </div>
   );
 }
