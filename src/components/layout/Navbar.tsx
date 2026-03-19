@@ -64,7 +64,7 @@ export default function Navbar() {
                     alignItems: 'center',
                     gap: '12px',
                     fontWeight: 900,
-                    color: scrolled ? 'var(--primary)' : 'var(--white)',
+                    // color: scrolled ? 'var(--primary)',
                     transition: 'all var(--transition-base)',
                     textShadow: scrolled ? 'none' : '0 2px 10px rgba(0,0,0,0.3)',
                 }}>
@@ -169,7 +169,7 @@ export default function Navbar() {
                         display: 'none',
                         background: 'none',
                         border: 'none',
-                        color: scrolled ? 'var(--gray-800)' : 'var(--white)',
+                        color:  'var(--gray-800)',
                         cursor: 'pointer',
                         padding: '8px',
                     }}

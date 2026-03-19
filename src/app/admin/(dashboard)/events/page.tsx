@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Search, Calendar, Image as ImageIcon, X, MapPin } from 'lucide-react';
 import MediaPicker from '@/components/admin/MediaPicker';
+import { useToast } from '@/context/ToastContext';
+import ConfirmModal from '@/components/ui/ConfirmModal';
+import { TableSkeleton } from '@/components/ui/Skeleton';
 
 interface Media {
     id: string;
@@ -22,6 +25,7 @@ interface Event {
 }
 
 export default function AdminEventsPage() {
+    const { showToast } = useToast();
     const [events, setEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -29,12 +33,15 @@ export default function AdminEventsPage() {
     const [search, setSearch] = useState('');
     const [showMediaPicker, setShowMediaPicker] = useState(false);
     const [selectedImages, setSelectedImages] = useState<Media[]>([]);
+    const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     function fetchEvents() {
+        setLoading(true);
         fetch('/api/events')
             .then(res => res.json())
             .then(data => setEvents(data))
-            .catch(() => { /* */ })
+            .catch(() => showToast('Failed to fetch events', 'error'))
             .finally(() => setLoading(false));
     }
 
@@ -71,27 +78,45 @@ export default function AdminEventsPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         })
-            .then(() => {
+            .then(res => {
+                if (!res.ok) throw new Error();
+                showToast(`Event ${editing ? 'updated' : 'created'} successfully!`, 'success');
                 setShowForm(false);
                 setEditing(null);
                 fetchEvents();
             })
-            .catch(() => { /* */ });
+            .catch(() => showToast(`Failed to ${editing ? 'update' : 'create'} event`, 'error'));
     }
 
-    function handleDelete(id: string) {
-        if (!confirm('Delete this event?')) return;
-        fetch(`/api/events/${id}`, { method: 'DELETE' })
-            .then(() => fetchEvents())
-            .catch(() => { /* */ });
+    function handleDelete() {
+        if (!confirmDelete) return;
+        setIsDeleting(true);
+        fetch(`/api/events/${confirmDelete}`, { method: 'DELETE' })
+            .then(res => {
+                if (!res.ok) throw new Error();
+                showToast('Event deleted successfully', 'success');
+                setConfirmDelete(null);
+                fetchEvents();
+            })
+            .catch(() => showToast('Failed to delete event', 'error'))
+            .finally(() => setIsDeleting(false));
     }
 
     const filtered = events.filter(e => e.title.toLowerCase().includes(search.toLowerCase()));
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                <h1 style={{ fontSize: '1.5rem' }}>Events</h1>
+            <ConfirmModal
+                isOpen={!!confirmDelete}
+                onClose={() => setConfirmDelete(null)}
+                onConfirm={handleDelete}
+                title="Delete Event"
+                message="Are you sure you want to delete this event? This action cannot be undone."
+                confirmText="Delete Event"
+                isLoading={isDeleting}
+            />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+                <h1 style={{ fontSize: '1.5rem', margin: 0 }}>Events</h1>
                 <button className="btn btn-primary" onClick={() => { setEditing(null); setSelectedImages([]); setShowForm(true); }}>
                     <Plus size={16} /> New Event
                 </button>
@@ -180,7 +205,7 @@ export default function AdminEventsPage() {
             )}
 
             {loading ? (
-                <div className="skeleton" style={{ height: '300px', borderRadius: 'var(--radius-lg)' }} />
+                <TableSkeleton cols={5} rows={6} />
             ) : (
                 <div className="table-container">
                     <table className="table">
@@ -206,7 +231,7 @@ export default function AdminEventsPage() {
                                     <td>
                                         <div style={{ display: 'flex', gap: '8px' }}>
                                             <button className="btn btn-ghost btn-sm" onClick={() => { setEditing(e); setShowForm(true); }}><Edit2 size={14} /></button>
-                                            <button className="btn btn-ghost btn-sm" style={{ color: 'var(--error)' }} onClick={() => handleDelete(e.id)}><Trash2 size={14} /></button>
+                                            <button className="btn btn-ghost btn-sm" style={{ color: 'var(--error)' }} onClick={() => setConfirmDelete(e.id)}><Trash2 size={14} /></button>
                                         </div>
                                     </td>
                                 </tr>

@@ -7,11 +7,10 @@ import {
     Users,
     Mail,
     TrendingUp,
-    ArrowUpRight,
-    ArrowDownRight,
     Calendar,
     ImageIcon
 } from 'lucide-react';
+import Skeleton from '@/components/ui/Skeleton';
 
 interface Stats {
     products: number;
@@ -65,8 +64,29 @@ export default function AdminDashboard() {
 
     if (loading) {
         return (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
-                {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="skeleton" style={{ height: '140px', borderRadius: 'var(--radius-lg)' }} />)}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+                    {[1, 2, 3, 4, 5, 6].map(i => (
+                        <div key={i} className="card" style={{ padding: '24px', height: '140px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+                                <Skeleton width="48px" height="48px" />
+                                <Skeleton width="40px" height="0.75rem" />
+                            </div>
+                            <Skeleton width="40%" height="0.75rem" className="mb-2" />
+                            <Skeleton width="60%" height="2rem" />
+                        </div>
+                    ))}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '32px' }}>
+                    <div className="card" style={{ padding: '24px', height: '300px' }}>
+                        <Skeleton width="150px" height="1.25rem" className="mb-6" />
+                        {[1, 2, 3].map(i => <Skeleton key={i} height="40px" className="mb-3" />)}
+                    </div>
+                    <div className="card" style={{ padding: '24px', height: '300px' }}>
+                        <Skeleton width="150px" height="1.25rem" className="mb-6" />
+                        {[1, 2, 3].map(i => <Skeleton key={i} height="40px" className="mb-3" />)}
+                    </div>
+                </div>
             </div>
         );
     }

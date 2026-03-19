@@ -15,6 +15,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { ToastProvider } from "@/context/ToastContext";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -23,7 +25,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+        <ToastProvider>
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );

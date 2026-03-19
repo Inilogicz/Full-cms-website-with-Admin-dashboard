@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Send, Mail, Phone, MapPin, Clock, MessageSquare, User, CheckCircle2 } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle2, User, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
+import { useToast } from '@/context/ToastContext';
 
 export default function ContactPage() {
+    const { showToast } = useToast();
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
 
@@ -16,6 +18,7 @@ export default function ContactPage() {
         setTimeout(() => {
             setSubmitted(true);
             setLoading(false);
+            showToast('Message sent successfully! We will get back to you soon.', 'success');
         }, 1200);
     }
 
@@ -174,7 +177,11 @@ export default function ContactPage() {
                                             color: 'white',
                                             fontWeight: 800,
                                             borderRadius: 'var(--radius-full)',
-                                            boxShadow: '0 10px 30px var(--gold-glow)'
+                                            boxShadow: '0 10px 30px var(--gold-glow)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '12px'
                                         }}>
                                             {loading ? 'Sending Message...' : <><Send size={18} /> Send Message</>}
                                         </button>

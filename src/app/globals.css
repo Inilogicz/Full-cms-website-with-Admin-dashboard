@@ -362,7 +362,7 @@ a {
   background: var(--white);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
-  overflow: hidden;
+  overflow-x: auto;
 }
 
 .table {

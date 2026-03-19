@@ -46,6 +46,121 @@ async function main() {
     }
     console.log('✅ FAQs seeded');
 
+    // Seed Events
+    const events = [
+        {
+            title: 'Annual Community Health Outreach 2025',
+            slug: 'annual-community-health-outreach-2025',
+            description: 'Our annual commitment to the wellbeing of our host community, providing free health screenings and hygiene education.',
+            eventDate: new Date('2025-05-15'),
+            location: 'Minna, Niger State',
+            category: 'Community',
+            status: 'published'
+        },
+        {
+            title: 'New Production Line Inauguration',
+            slug: 'new-production-line-inauguration',
+            description: 'Official opening of our state-of-the-art automated production facility for LadySept sanitary towels.',
+            eventDate: new Date('2025-02-10'),
+            location: 'Factory Complex',
+            category: 'Factory',
+            status: 'published'
+        },
+        {
+            title: 'ISO Certification Celebration',
+            slug: 'iso-certification-celebration',
+            description: 'Celebrating our achievement of ISO 9001:2015 certification for quality management systems.',
+            eventDate: new Date('2024-11-20'),
+            location: 'Corporate HQ',
+            category: 'Quality',
+            status: 'published'
+        }
+    ];
+
+    for (const e of events) {
+        const createdEvent = await prisma.event.upsert({
+            where: { slug: e.slug },
+            update: {},
+            create: e
+        });
+
+        // Add a placeholder image for each event
+        await prisma.media.upsert({
+            where: { publicId: `event-${createdEvent.slug}` },
+            update: { eventId: createdEvent.id },
+            create: {
+                publicId: `event-${createdEvent.slug}`,
+                cloudinaryUrl: `https://images.unsplash.com/photo-1540575861501-7ce0e220bed7?auto=format&fit=crop&q=80&w=800`,
+                altText: createdEvent.title,
+                eventId: createdEvent.id
+            }
+        });
+    }
+    console.log('✅ Events seeded with images');
+
+    // Seed Gallery Items
+    const galleryItems = [
+        { caption: 'Automated Production Line in full operation', category: 'Factory', imageUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=800' },
+        { caption: 'Our dedicated quality assurance team at work', category: 'Quality', imageUrl: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=800' },
+        { caption: 'Modern packaging systems for LadySept products', category: 'Packaging', imageUrl: 'https://images.unsplash.com/photo-1620014134773-4d54244e9ed1?auto=format&fit=crop&q=80&w=800' },
+        { caption: 'Community hygiene workshop participants', category: 'Community', imageUrl: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=800' },
+        { caption: 'Showcasing our complete product range', category: 'Products', imageUrl: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=800' },
+        { caption: 'Our skilled technicians during training', category: 'Team', imageUrl: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80&w=800' },
+        { caption: 'Precision testing in our NAFDAC certified lab', category: 'Quality', imageUrl: 'https://images.unsplash.com/photo-1579154273821-ad99159f50e5?auto=format&fit=crop&q=80&w=800' },
+        { caption: 'Factory aerial view showing our expansion', category: 'Factory', imageUrl: 'https://images.unsplash.com/photo-1565793298595-6a879b1d9492?auto=format&fit=crop&q=80&w=800' },
+    ];
+
+    for (const g of galleryItems) {
+        await prisma.galleryItem.create({ data: g });
+    }
+    console.log('✅ Gallery items seeded');
+
+    // Seed Blog Posts
+    const blogPosts = [
+        {
+            title: 'Modernizing Menstrual Hygiene in Nigeria',
+            slug: 'modernizing-menstrual-hygiene-in-nigeria',
+            content: 'At Niger Sanitary Industry Limited, we are committed to providing high-quality sanitary solutions that empower women and girls across the nation. Our latest production technology ensures maximum absorbency and comfort...',
+            excerpt: 'Exploring the impact of modern manufacturing on the accessibility of quality menstrual hygiene products.',
+            category: 'Hygiene Tips',
+            status: 'published',
+            featured: true,
+            featuredImage: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=800',
+            publishedAt: new Date('2025-03-01')
+        },
+        {
+            title: 'Expanding Our Reach: New Distribution Hubs in 2025',
+            slug: 'expanding-our-reach-new-distribution-hubs-2025',
+            content: 'To better serve our customers, we are excited to announce the opening of three new distribution centers across the northern region. This expansion will significantly reduce lead times and ensure LadySept products are always available...',
+            excerpt: 'Company expansion updates and our commitment to statewide availability.',
+            category: 'Company News',
+            status: 'published',
+            featured: false,
+            featuredImage: 'https://images.unsplash.com/photo-1586528116311-ad86d7c71822?auto=format&fit=crop&q=80&w=800',
+            publishedAt: new Date('2025-02-15')
+        },
+        {
+            title: 'The Science Behind LadySept Absorbency',
+            slug: 'the-science-behind-ladysept-absorbency',
+            content: 'Our R&D team has been working tirelessly to enhance the core technology of our sanitary towels. By utilizing advanced multi-layer polymer structures, we have achieved a 30% increase in quick-dry performance...',
+            excerpt: 'An inside look at the materials and technology that make our products superior.',
+            category: 'Product Innovation',
+            status: 'published',
+            featured: true,
+            featuredImage: 'https://images.unsplash.com/photo-1532187875605-186c7141064b?auto=format&fit=crop&q=80&w=800',
+            publishedAt: new Date('2025-01-20')
+        }
+    ];
+
+    for (const b of blogPosts) {
+        await prisma.blogPost.upsert({
+            where: { slug: b.slug },
+            update: {},
+            create: b
+        });
+    }
+    console.log('✅ Blog posts seeded');
+
     console.log('🎉 Seeding complete!');
     console.log('');
     console.log('Admin Login Credentials:');

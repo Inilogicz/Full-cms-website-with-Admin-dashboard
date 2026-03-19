@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, Search, Image as ImageIcon, X } from 'lucide-react';
+import { useToast } from '@/context/ToastContext';
+import ConfirmModal from '@/components/ui/ConfirmModal';
+import Skeleton from '@/components/ui/Skeleton';
 
 interface GalleryItem {
     id: string;
@@ -12,17 +15,21 @@ interface GalleryItem {
 }
 
 export default function AdminGalleryPage() {
+    const { showToast } = useToast();
     const [items, setItems] = useState<GalleryItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [search, setSearch] = useState('');
     const [uploading, setUploading] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     function fetchItems() {
+        setLoading(true);
         fetch('/api/gallery')
             .then(res => res.json())
             .then(data => setItems(data))
-            .catch(() => { /* */ })
+            .catch(() => showToast('Failed to fetch gallery items', 'error'))
             .finally(() => setLoading(false));
     }
 
@@ -40,6 +47,7 @@ export default function AdminGalleryPage() {
 
         if (!file || file.size === 0) {
             setUploading(false);
+            showToast('Please select an image file', 'warning');
             return;
         }
 
@@ -71,30 +79,47 @@ export default function AdminGalleryPage() {
             })
             .then(res => {
                 if (!res.ok) throw new Error('Gallery creation failed');
+                showToast('Image added to gallery successfully!', 'success');
                 setShowForm(false);
                 fetchItems();
             })
             .catch(err => {
                 console.error('Error:', err);
-                alert('An error occurred during upload or submission.');
+                showToast(err.message || 'An error occurred during upload', 'error');
             })
             .finally(() => {
                 setUploading(false);
             });
     }
 
-    function handleDelete(id: string) {
-        if (!confirm('Delete this gallery item?')) return;
-        fetch(`/api/gallery/${id}`, { method: 'DELETE' })
-            .then(() => fetchItems())
-            .catch(() => { /* */ });
+    function handleDelete() {
+        if (!confirmDelete) return;
+        setIsDeleting(true);
+        fetch(`/api/gallery/${confirmDelete}`, { method: 'DELETE' })
+            .then(res => {
+                if (!res.ok) throw new Error();
+                showToast('Gallery item removed', 'success');
+                setConfirmDelete(null);
+                fetchItems();
+            })
+            .catch(() => showToast('Failed to remove item', 'error'))
+            .finally(() => setIsDeleting(false));
     }
 
     const filtered = items.filter(i => (i.caption || '').toLowerCase().includes(search.toLowerCase()));
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+            <ConfirmModal
+                isOpen={!!confirmDelete}
+                onClose={() => setConfirmDelete(null)}
+                onConfirm={handleDelete}
+                title="Remove Gallery Item"
+                message="Are you sure you want to remove this image from the gallery? This action cannot be undone."
+                confirmText="Remove Item"
+                isLoading={isDeleting}
+            />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
                 <h1 style={{ fontSize: '1.5rem' }}>Gallery Management</h1>
                 <button className="btn btn-primary" onClick={() => setShowForm(true)}>
                     <Plus size={16} /> Add Image
@@ -140,8 +165,16 @@ export default function AdminGalleryPage() {
             )}
 
             {loading ? (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px' }}>
-                    {Array.from({ length: 8 }).map((_, i) => <div key={i} className="skeleton" style={{ aspectRatio: '1', borderRadius: 'var(--radius-lg)' }} />)}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '20px' }}>
+                    {Array.from({ length: 8 }).map((_, i) => (
+                        <div key={i} className="card" style={{ padding: 0, overflow: 'hidden' }}>
+                            <Skeleton height="200px" borderRadius="0" />
+                            <div style={{ padding: '16px' }}>
+                                <Skeleton width="40%" height="0.75rem" className="mb-2" />
+                                <Skeleton width="80%" height="1rem" />
+                            </div>
+                        </div>
+                    ))}
                 </div>
             ) : filtered.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '80px 20px', color: 'var(--gray-400)' }}>
@@ -156,7 +189,7 @@ export default function AdminGalleryPage() {
                                 <img src={item.imageUrl} alt={item.caption || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 <button
                                     className="btn btn-ghost btn-sm"
-                                    onClick={() => handleDelete(item.id)}
+                                    onClick={() => setConfirmDelete(item.id)}
                                     style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(255,255,255,0.9)', color: 'var(--error)' }}
                                 >
                                     <Trash2 size={14} />
