@@ -718,19 +718,6 @@ a {
   }
 }
 
-/* Admin Dashboard Layout */
-@media (max-width: 1024px) {
-  .admin-sidebar {
-    transform: translateX(-100%);
-  }
-
-  .mobile-menu-btn {
-    display: block !important;
-  }
-
-  /* Removed to avoid Turbopack issues */
-}
-
 /* About Page */
 .about-wrapper {
   overflow: hidden;

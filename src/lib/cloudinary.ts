@@ -1,21 +1,25 @@
 import { v2 as cloudinary } from 'cloudinary';
 
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-export default cloudinary;
-
 export async function uploadImage(file: string, folder: string = 'niger-sanitary') {
     try {
+        // Configure inside the function to ensure environment variables are loaded
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET,
+            secure: true
+        });
+
+        const secret = process.env.CLOUDINARY_API_SECRET || '';
+        console.log('Cloudinary Config Attempt:', {
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret_start: secret.substring(0, 4),
+            api_secret_end: secret.substring(secret.length - 4),
+        });
+
         const result = await cloudinary.uploader.upload(file, {
-            folder,
             resource_type: 'image',
-            transformation: [
-                { quality: 'auto', fetch_format: 'auto' }
-            ]
         });
         return {
             url: result.secure_url,
@@ -33,6 +37,12 @@ export async function uploadImage(file: string, folder: string = 'niger-sanitary
 
 export async function deleteImage(publicId: string) {
     try {
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET,
+            secure: true
+        });
         const result = await cloudinary.uploader.destroy(publicId);
         return result;
     } catch (error) {
@@ -40,6 +50,8 @@ export async function deleteImage(publicId: string) {
         throw error;
     }
 }
+
+export default cloudinary;
 
 export function getOptimizedUrl(publicId: string, options: {
     width?: number;

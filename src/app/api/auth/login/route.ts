@@ -32,8 +32,12 @@ export async function POST(req: NextRequest) {
         });
 
         return response;
-    } catch (error) {
-        console.error('Login error:', error);
+    } catch (error: any) {
+        console.error('Login error detailed:', error);
+        // Fallback for specific initialization errors to help debugging
+        if (error.message?.includes('Prisma Client could not locate the Query Engine')) {
+            return NextResponse.json({ error: 'Database initialization error. Please try again in a moment.' }, { status: 500 });
+        }
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }

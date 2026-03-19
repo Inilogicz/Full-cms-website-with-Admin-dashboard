@@ -145,10 +145,10 @@ export default function HomePage() {
           style={{
             position: 'absolute',
             inset: 0,
-            // backgroundImage: "url('/premium_abstract_blue_gold_bg.png')",
+           
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            opacity: 0.75, // Reduced opacity
+            // opacity: 0.75, 
             y: y1,
           }}
         />

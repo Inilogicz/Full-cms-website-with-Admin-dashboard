@@ -4,15 +4,16 @@ import { useState, useEffect } from 'react';
 import {
     Package,
     FileText,
-    Calendar,
-    Image,
     Users,
     Mail,
     TrendingUp,
     ArrowUpRight,
+    ArrowDownRight,
+    Calendar,
+    ImageIcon
 } from 'lucide-react';
 
-interface DashboardStats {
+interface Stats {
     products: number;
     blogPosts: number;
     events: number;
@@ -25,9 +26,8 @@ interface Lead {
     id: string;
     companyName: string;
     contactPerson: string;
-    email: string;
-    createdAt: string;
     status: string;
+    createdAt: string;
 }
 
 interface Subscriber {
@@ -37,90 +37,76 @@ interface Subscriber {
 }
 
 export default function AdminDashboard() {
-    const [stats, setStats] = useState<DashboardStats | null>(null);
+    const [stats, setStats] = useState<Stats | null>(null);
     const [recentLeads, setRecentLeads] = useState<Lead[]>([]);
     const [recentSubscribers, setRecentSubscribers] = useState<Subscriber[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetch('/api/dashboard/stats')
-            .then(r => r.json())
+            .then(res => res.json())
             .then(data => {
                 setStats(data.stats);
                 setRecentLeads(data.recentLeads || []);
                 setRecentSubscribers(data.recentSubscribers || []);
             })
+            .catch(() => { /* handle error */ })
             .finally(() => setLoading(false));
     }, []);
 
-    const statCards = [
-        { label: 'Products', value: stats?.products || 0, icon: Package, color: '#0A4DA2', bg: '#E3F2FD' },
-        { label: 'Blog Posts', value: stats?.blogPosts || 0, icon: FileText, color: '#1565C0', bg: '#BBDEFB' },
-        { label: 'Events', value: stats?.events || 0, icon: Calendar, color: '#00B4D8', bg: '#E0F7FA' },
-        { label: 'Gallery Items', value: stats?.gallery || 0, icon: Image, color: '#7C3AED', bg: '#EDE9FE' },
-        { label: 'Distributor Leads', value: stats?.leads || 0, icon: Users, color: '#059669', bg: '#D1FAE5' },
-        { label: 'Subscribers', value: stats?.subscribers || 0, icon: Mail, color: '#D97706', bg: '#FEF3C7' },
+    const cards = [
+        { name: 'Products', value: stats?.products || 0, icon: Package, color: 'var(--primary)', bg: 'var(--primary-50)' },
+        { name: 'Blog Posts', value: stats?.blogPosts || 0, icon: FileText, color: '#8b5cf6', bg: '#f5f3ff' },
+        { name: 'Events', value: stats?.events || 0, icon: Calendar, color: '#f59e0b', bg: '#fffbeb' },
+        { name: 'Gallery Items', value: stats?.gallery || 0, icon: ImageIcon, color: '#ec4899', bg: '#fdf2f8' },
+        { name: 'Distributor Leads', value: stats?.leads || 0, icon: Users, color: '#10b981', bg: '#ecfdf5' },
+        { name: 'Newsletter Subs', value: stats?.subscribers || 0, icon: Mail, color: '#3b82f6', bg: '#eff6ff' },
     ];
 
     if (loading) {
         return (
-            <div>
-                <h1 style={{ fontSize: '1.5rem', marginBottom: '24px' }}>Dashboard</h1>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px', marginBottom: '32px' }}>
-                    {Array.from({ length: 6 }).map((_, i) => (
-                        <div key={i} className="skeleton" style={{ height: '120px', borderRadius: 'var(--radius-lg)' }} />
-                    ))}
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-                    <div className="skeleton" style={{ height: '300px', borderRadius: 'var(--radius-lg)' }} />
-                    <div className="skeleton" style={{ height: '300px', borderRadius: 'var(--radius-lg)' }} />
-                </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+                {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="skeleton" style={{ height: '140px', borderRadius: 'var(--radius-lg)' }} />)}
             </div>
         );
     }
 
     return (
-        <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
-                <div>
-                    <h1 style={{ fontSize: '1.5rem', marginBottom: '4px' }}>Dashboard</h1>
-                    <p style={{ color: 'var(--gray-500)', fontSize: '0.9375rem' }}>Welcome back! Here&apos;s your platform overview.</p>
-                </div>
-            </div>
-
-            {/* Stat Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px', marginBottom: '32px' }}>
-                {statCards.map((stat) => (
-                    <div key={stat.label} className="card" style={{ padding: '24px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+                {cards.map((card) => (
+                    <div key={card.name} className="card" style={{ padding: '24px', position: 'relative', overflow: 'hidden' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                             <div style={{
-                                width: 44,
-                                height: 44,
+                                width: '48px',
+                                height: '48px',
                                 borderRadius: 'var(--radius-md)',
-                                background: stat.bg,
+                                background: card.bg,
+                                color: card.color,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                             }}>
-                                <stat.icon size={22} style={{ color: stat.color }} />
+                                <card.icon size={24} />
                             </div>
-                            <ArrowUpRight size={16} style={{ color: 'var(--success)' }} />
+                            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--gray-400)', display: 'flex', alignItems: 'center', gap: '2px' }}>
+                                Total <TrendingUp size={12} />
+                            </span>
                         </div>
-                        <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--gray-900)', marginBottom: '4px' }}>
-                            {stat.value}
+                        <div>
+                            <div style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--gray-500)', marginBottom: '4px' }}>{card.name}</div>
+                            <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--gray-900)' }}>{card.value}</div>
                         </div>
-                        <div style={{ fontSize: '0.8125rem', color: 'var(--gray-500)' }}>{stat.label}</div>
                     </div>
                 ))}
             </div>
 
-            {/* Activity Tables */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '32px' }}>
                 {/* Recent Leads */}
-                <div className="table-container">
-                    <div style={{ padding: '20px 20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <h3 style={{ fontSize: '1rem' }}>Recent Distributor Leads</h3>
-                        <span className="badge badge-primary">
+                <div className="card" style={{ padding: '24px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                        <h3 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Recent Distributor Leads</h3>
+                        <span className="badge badge-primary" style={{ fontSize: '0.75rem' }}>
                             <Users size={12} style={{ marginRight: '4px' }} />{stats?.leads || 0} Total
                         </span>
                     </div>
@@ -151,10 +137,10 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Recent Subscribers */}
-                <div className="table-container">
-                    <div style={{ padding: '20px 20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <h3 style={{ fontSize: '1rem' }}>Recent Newsletter Subscribers</h3>
-                        <span className="badge badge-primary">
+                <div className="card" style={{ padding: '24px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                        <h3 style={{ fontSize: '1.125rem', fontWeight: 700 }}>Latest Subscribers</h3>
+                        <span className="badge badge-primary" style={{ fontSize: '0.75rem' }}>
                             <Mail size={12} style={{ marginRight: '4px' }} />{stats?.subscribers || 0} Total
                         </span>
                     </div>
