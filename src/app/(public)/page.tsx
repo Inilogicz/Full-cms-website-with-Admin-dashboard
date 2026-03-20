@@ -130,109 +130,220 @@ export default function HomePage() {
 
   return (
     <div className="homepage-wrapper">
-      {/* Hero Section - Lightened */}
-      <section style={{
-        position: 'relative',
-        minHeight: '90vh',
-        display: 'flex',
-        alignItems: 'center',
-        paddingTop: '80px',
-        background: 'linear-gradient(to bottom, #f8faff 0%, #ffffff 100%)',
-        overflow: 'hidden',
-      }}>
-        {/* Background layer with lower opacity for "airy" feel */}
-        <motion.div
-          style={{
+      {/* Hero Section - Redesigned for Visual Excellence */}
+      <section
+        className="hero-section-refined"
+        style={{
+          position: 'relative',
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          paddingTop: '80px',
+          paddingBottom: '80px',
+          background: 'var(--gray-50)',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Dynamic Background Elements */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
+          {/* Animated Mesh/Grid */}
+          <div style={{
             position: 'absolute',
             inset: 0,
-           
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            // opacity: 0.75, 
-            y: y1,
-          }}
-        />
+            backgroundImage: `radial-gradient(circle at 2px 2px, rgba(10, 77, 162, 0.05) 1px, transparent 0)`,
+            backgroundSize: '40px 40px',
+            opacity: 0.5,
+          }} />
 
-        {/* Lighter overlays */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 1) 100%)',
-          zIndex: 1,
-        }} />
+          {/* Large Background Decorative Text (Visible on Mobile for depth) */}
+          <div style={{
+            position: 'absolute',
+            top: '15%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            fontSize: 'clamp(5rem, 20vw, 12rem)',
+            fontWeight: 900,
+            color: 'transparent',
+            WebkitTextStroke: '1.5px rgba(10, 77, 162, 0.05)',
+            whiteSpace: 'nowrap',
+            zIndex: 0,
+            pointerEvents: 'none',
+            letterSpacing: '0.1em'
+          }}>
+            NIGER SANITARY
+          </div>
+
+          <div style={{
+            position: 'absolute',
+            bottom: '20%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            fontSize: 'clamp(5rem, 20vw, 12rem)',
+            fontWeight: 900,
+            color: 'transparent',
+            WebkitTextStroke: '1.5px rgba(212, 175, 55, 0.05)',
+            whiteSpace: 'nowrap',
+            zIndex: 0,
+            pointerEvents: 'none',
+            letterSpacing: '0.1em'
+          }}>
+            EXCELLENCE
+          </div>
+
+          {/* Morphing Blobs */}
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              x: [0, 100, 0],
+              y: [0, -50, 0],
+            }}
+            transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
+            style={{
+              position: 'absolute',
+              top: '-10%',
+              left: '-10%',
+              width: '600px',
+              height: '600px',
+              background: 'radial-gradient(circle, rgba(10, 77, 162, 0.08) 0%, transparent 70%)',
+              filter: 'blur(80px)',
+              borderRadius: '50%',
+            }}
+          />
+          <motion.div
+            animate={{
+              scale: [1, 1.3, 1],
+              x: [0, -120, 0],
+              y: [0, 80, 0],
+            }}
+            transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+            style={{
+              position: 'absolute',
+              bottom: '-15%',
+              right: '-5%',
+              width: '700px',
+              height: '700px',
+              background: 'radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%)',
+              filter: 'blur(100px)',
+              borderRadius: '50%',
+            }}
+          />
+        </div>
+
+        {/* Floating Icons (Mobile & Desktop) */}
+        <motion.div
+          animate={{ y: [0, -15, 0], rotate: [0, 5, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ position: 'absolute', top: '25%', left: '5%', color: 'var(--primary)', opacity: 0.15, zIndex: 1 }}
+        >
+          <Shield size={64} />
+        </motion.div>
+        <motion.div
+          animate={{ y: [0, 15, 0], rotate: [0, -5, 0] }}
+          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+          style={{ position: 'absolute', bottom: '25%', right: '8%', color: 'var(--gold)', opacity: 0.15, zIndex: 1 }}
+        >
+          <Star size={48} />
+        </motion.div>
+        <motion.div
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+          style={{ position: 'absolute', top: '40%', right: '5%', color: 'var(--accent)', opacity: 0.1, zIndex: 1 }}
+        >
+          <Heart size={80} />
+        </motion.div>
 
         <div className="container" style={{ position: 'relative', zIndex: 10 }}>
-          <div style={{
+          <div className="responsive-hero-grid" style={{
             display: 'grid',
-            gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 0.8fr)',
-            gap: '40px',
+            gridTemplateColumns: 'minmax(0, 1.15fr) minmax(0, 0.85fr)',
+            gap: '60px',
             alignItems: 'center',
           }}>
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: 'easeOut' }}
+              style={{ textAlign: 'left' }}
+              className="hero-text-content"
             >
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2 }}
+                transition={{ delay: 0.4, type: 'spring' }}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '8px',
-                  background: 'var(--gold-50)',
+                  background: 'white',
                   borderRadius: 'var(--radius-full)',
-                  padding: '6px 16px',
-                  marginBottom: '24px',
-                  color: 'var(--gold-dark)',
-                  fontWeight: 700,
-                  fontSize: '0.75rem',
-                  border: '1px solid rgba(212, 175, 55, 0.2)',
+                  padding: '8px 20px',
+                  marginBottom: '32px',
+                  color: 'var(--primary-dark)',
+                  fontWeight: 800,
+                  fontSize: '0.8125rem',
+                  boxShadow: '0 4px 20px rgba(10, 77, 162, 0.08)',
+                  border: '1px solid var(--gray-100)',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.05em'
+                  letterSpacing: '0.08em'
                 }}
               >
-                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--gold)' }} />
-                Premium Healthcare Leader
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--gold)', boxShadow: '0 0 10px var(--gold)' }} />
+                Premium Manufacturing Leader
               </motion.div>
 
               <h1 style={{
-                fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
+                fontSize: 'clamp(2.75rem, 8vw, 4.8rem)',
                 fontWeight: 900,
-                lineHeight: 1.1,
-                marginBottom: '20px',
+                lineHeight: 1.05,
+                letterSpacing: '-0.02em',
+                marginBottom: '24px',
                 color: 'var(--primary-dark)',
               }}>
                 Redefining <br />
-                <span className="text-gradient-gold">Standard of Care</span>
+                <span className="text-gradient-gold" style={{ filter: 'drop-shadow(0 0 20px rgba(212, 175, 55, 0.2))' }}>Standard of Care</span> <br />
+                <span style={{ fontSize: '0.4em', verticalAlign: 'middle', opacity: 0.5, fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', display: 'block', marginTop: '12px' }}>Empowering Millions Since 1999</span>
               </h1>
 
               <p style={{
                 color: 'var(--gray-600)',
-                fontSize: '1.125rem',
+                fontSize: '1.25rem',
                 lineHeight: 1.6,
-                marginBottom: '40px',
-                maxWidth: '560px',
+                marginBottom: '48px',
+                maxWidth: '600px',
+                fontWeight: 500,
               }}>
-                Manufacturing excellence that empowers millions. Quality solutions delivered with integrity and local commitment.
+                Precision engineering meets clinical trust. We deliver cutting-edge healthcare manufacturing solutions across the West African region.
               </p>
 
-              <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }} className="hero-button-group">
                 <Link href="/products" className="btn btn-lg" style={{
-                  background: 'var(--gradient-gold)',
+                  background: 'var(--gradient-primary)',
                   color: 'white',
-                  padding: '16px 40px',
+                  padding: '18px 44px',
                   borderRadius: 'var(--radius-full)',
-                  boxShadow: '0 8px 24px var(--gold-glow)'
+                  boxShadow: '0 12px 30px rgba(10, 77, 162, 0.25)',
+                  overflow: 'hidden',
+                  position: 'relative'
                 }}>
-                  Explore Catalogue
+                  <span style={{ position: 'relative', zIndex: 1 }}>Explore Our Products</span>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+                    style={{
+                      position: 'absolute',
+                      inset: '-50%',
+                      background: 'conic-gradient(from 0deg, transparent 0% 80%, rgba(255,255,255,0.2) 100%)',
+                      zIndex: 0,
+                    }}
+                  />
                 </Link>
-                <Link href="/about" className="btn btn-lg btn-secondary" style={{
+                <Link href="/about" className="btn btn-lg" style={{
                   borderRadius: 'var(--radius-full)',
-                  background: 'transparent',
+                  background: 'white',
                   border: '1.5px solid var(--gray-200)',
-                  color: 'var(--gray-700)'
+                  color: 'var(--gray-700)',
+                  padding: '18px 44px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
                 }}>
                   Our Heritage
                 </Link>
@@ -240,45 +351,130 @@ export default function HomePage() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
+              initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
               className="hero-media-container"
+              style={{ position: 'relative' }}
             >
-              <div style={{ position: 'relative', padding: '10px' }}>
+              <div style={{ position: 'relative', padding: '20px' }}>
+                {/* Main Image Container with Premium Border */}
                 <div style={{
-                  borderRadius: 'var(--radius-xl)',
+                  borderRadius: '40px',
                   overflow: 'hidden',
-                  aspectRatio: '1',
-                  boxShadow: '0 40px 100px -20px rgba(10, 77, 162, 0.15)',
-                  border: '8px solid white',
-                  background: 'white'
+                  aspectRatio: '0.85',
+                  // boxShadow: '0 50px 100px -20px rgba(10, 77, 162, 0.2)',
+                  border: '12px solid white',
+                  background: 'white',
+                  position: 'relative',
+                  zIndex: 2,
                 }}>
-                  <img src="/hero.png" alt="Facility" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src="/hero.png" alt="State of the art facility" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'linear-gradient(to top, rgba(10, 77, 162, 0.2), transparent)',
+                    mixBlendMode: 'multiply'
+                  }} />
                 </div>
 
-                {/* Floating Badge - Sleeker */}
+                {/* Decorative Back Shape */}
+                <div style={{
+                  position: 'absolute',
+                  inset: '0 -20px -20px 20px',
+                  background: 'var(--gradient-gold)',
+                  zIndex: 1,
+                  opacity: 0.15,
+                }} />
+
+                {/* Floating Metrics Badge */}
                 <motion.div
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 4, repeat: Infinity }}
+                  animate={{ y: [0, -15, 0], x: [0, 5, 0] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
                   style={{
                     position: 'absolute',
-                    top: '-10%',
-                    right: '-5%',
-                    background: 'white',
-                    padding: '16px 24px',
-                    borderRadius: 'var(--radius-lg)',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                    top: '5%',
+                    right: '-8%',
+                    background: 'rgba(255, 255, 255, 0.9)',
+                    backdropFilter: 'blur(10px)',
+                    padding: '24px',
+                    borderRadius: '24px',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.08)',
                     zIndex: 10,
-                    border: '1px solid var(--gray-50)'
+                    border: '1px solid rgba(255, 255, 255, 0.5)',
+                    textAlign: 'center'
                   }}
                 >
-                  <div style={{ color: 'var(--gold-dark)', fontWeight: 900, fontSize: '1.5rem' }}>100M+</div>
-                  <div style={{ fontSize: '0.625rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--gray-400)', letterSpacing: '0.1em' }}>Units Yearly</div>
+                  <div style={{ color: 'var(--gold-dark)', fontWeight: 900, fontSize: '2rem', lineHeight: 1 }}>150M+</div>
+                  <div style={{ fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--gray-500)', letterSpacing: '0.1em', marginTop: '4px' }}>Units Monthly</div>
+                  <div style={{
+                    marginTop: '12px',
+                    height: '4px',
+                    background: 'var(--gray-100)',
+                    borderRadius: '2px',
+                    overflow: 'hidden'
+                  }}>
+                    <motion.div
+                      animate={{ width: ['0%', '85%', '85%'] }}
+                      transition={{ duration: 2, delay: 1 }}
+                      style={{ height: '100%', background: 'var(--gold)', borderRadius: '2px' }}
+                    />
+                  </div>
+                </motion.div>
+
+                {/* Quality Badge */}
+                <motion.div
+                  animate={{ scale: [1, 1.05, 1], rotate: [0, -5, 0] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+                  style={{
+                    position: 'absolute',
+                    bottom: '10%',
+                    left: '-10%',
+                    background: 'var(--primary-dark)',
+                    color: 'white',
+                    padding: '16px 20px',
+                    borderRadius: '20px',
+                    boxShadow: '0 15px 30px rgba(10, 77, 162, 0.2)',
+                    zIndex: 10,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
+                  }}
+                >
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    // borderRadius: '12px',
+                    background: 'rgba(255,255,255,0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <Award size={24} color="var(--gold)" />
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 800, fontSize: '0.875rem' }}>ISO 9001:2015</div>
+                    <div style={{ fontSize: '0.625rem', opacity: 0.7, textTransform: 'uppercase' }}>Certified Quality</div>
+                  </div>
                 </motion.div>
               </div>
             </motion.div>
           </div>
+        </div>
+
+        {/* Bottom Curved Divider */}
+        <div style={{
+          position: 'absolute',
+          bottom: -1,
+          left: 0,
+          right: 0,
+          lineHeight: 0,
+          zIndex: 5,
+          color: 'var(--white)'
+        }}>
+          <svg viewBox="0 0 1440 120" fill="currentColor" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style={{ width: '100%', height: '80px' }}>
+            <path d="M0 120L60 110C120 100 240 80 360 73.3C480 66.7 600 73.3 720 80C840 86.7 960 93.3 1080 86.7C1200 80 1320 60 1380 50L1440 40V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" />
+          </svg>
         </div>
       </section>
 
@@ -405,7 +601,7 @@ export default function HomePage() {
                           <img
                             src={product.images[0].cloudinaryUrl}
                             alt={product.name}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '12px' }}
                           />
                         ) : (
                           <div style={{ fontSize: '48px', opacity: 0.2 }}>📦</div>
@@ -456,34 +652,90 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Refined Content Sections */}
-      <section className="section" style={{ background: 'white', padding: '100px 0' }}>
+      {/* Manufacturing & Features - Premium Responsive Section */}
+      <section className="section section-manufacturing" style={{ background: 'white', padding: '100px 0', borderTop: '1px solid var(--gray-50)' }}>
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'center' }}>
+          <div className="responsive-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px', alignItems: 'center' }}>
             <motion.div {...fadeInUp}>
-              <span className="section-label">Manufacturing</span>
-              <h2 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '20px' }}>Precision Engineering <br /><span className="text-gold">Sustainable Production</span></h2>
-              <p style={{ color: 'var(--gray-600)', marginBottom: '32px', fontSize: '1rem' }}>Our ultra-modern facility in Niger State utilizes automated systems to ensure every product meets pharmaceutical-grade hygiene standards.</p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+              <div style={{ marginBottom: '32px' }}>
+                <span className="section-label">Manufacturing Excellence</span>
+                <h2 style={{ fontSize: 'clamp(2rem, 5vw, 2.75rem)', fontWeight: 900, marginBottom: '24px', lineHeight: 1.1 }}>
+                  Precision Engineering <br />
+                  <span className="text-gradient-gold">Sustainable Production</span>
+                </h2>
+                <p style={{ color: 'var(--gray-600)', fontSize: '1.125rem', lineHeight: 1.7, maxWidth: '540px' }}>
+                  Our ultra-modern facility in Niger State utilizes automated systems to ensure every product meets pharmaceutical-grade hygiene standards.
+                </p>
+              </div>
+
+              <div className="responsive-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
                 {features.map((f, i) => (
-                  <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <div style={{ color: 'var(--gold)', padding: '4px' }}><f.icon size={20} /></div>
-                    <div>
-                      <div style={{ fontWeight: 800, fontSize: '0.875rem' }}>{f.title}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--gray-500)', lineHeight: 1.3 }}>{f.description}</div>
+                  <motion.div
+                    key={i}
+                    whileHover={{ y: -5 }}
+                    style={{
+                      display: 'flex',
+                      gap: '16px',
+                      alignItems: 'flex-start',
+                      padding: '20px',
+                      background: 'var(--gray-50)',
+                      borderRadius: 'var(--radius-lg)',
+                      border: '1px solid var(--gray-100)',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    <div style={{
+                      color: 'var(--gold)',
+                      padding: '10px',
+                      background: 'white',
+                      borderRadius: '12px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <f.icon size={24} strokeWidth={2.5} />
                     </div>
-                  </div>
+                    <div>
+                      <div style={{ fontWeight: 800, fontSize: '0.9375rem', marginBottom: '4px', color: 'var(--primary-dark)' }}>{f.title}</div>
+                      <div style={{ fontSize: '0.8125rem', color: 'var(--gray-500)', lineHeight: 1.4 }}>{f.description}</div>
+                    </div>
+                  </motion.div>
                 ))}
               </div>
             </motion.div>
+
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
-              className="glass-premium"
-              style={{ position: 'relative', borderRadius: 'var(--radius-xl)', overflow: 'hidden', aspectRatio: '4/3' }}
+              viewport={{ once: true }}
+              style={{ position: 'relative' }}
             >
-              <img src="/hero-bg.jpg" alt="Facility" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,77,162,0.4), transparent)' }} />
+              <div style={{
+                position: 'relative',
+                borderRadius: 'var(--radius-xl)',
+                overflow: 'hidden',
+                aspectRatio: '4/3',
+                boxShadow: '0 40px 80px -20px rgba(10, 77, 162, 0.15)',
+                border: '1px solid var(--gray-100)'
+              }}>
+                <img src="/hero-bg.jpg" alt="Niger Sanitary Modern Facility" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10, 77, 162, 0.3), transparent)' }} />
+              </div>
+
+              {/* Decorative Accent on Image */}
+              <div style={{
+                position: 'absolute',
+                top: '-20px',
+                right: '-20px',
+                width: '100px',
+                height: '100px',
+                background: 'var(--gold)',
+                borderRadius: '50%',
+                opacity: 0.1,
+                filter: 'blur(30px)',
+                zIndex: -1
+              }} />
             </motion.div>
           </div>
         </div>
