@@ -20,6 +20,7 @@ const navLinks = [
             { name: 'Work Floor Underpad', href: '/products/work-floor-underpad' },
         ]
     },
+    { name: 'Where to Buy', href: '/where-to-buy' },
     { name: 'Gallery', href: '/gallery' },
     { name: 'Events', href: '/events' },
     { name: 'Blog', href: '/blog' },
@@ -46,7 +47,7 @@ export default function Navbar() {
                 left: 0,
                 right: 0,
                 zIndex: 1000,
-                background: scrolled ? 'rgba(255,255,255,0.95)' : 'transparent',
+                background: 'rgba(255,255,255,0.95)',
                 backdropFilter: scrolled ? 'blur(20px)' : 'none',
                 boxShadow: scrolled ? 'var(--shadow-md)' : 'none',
                 transition: 'all var(--transition-base)',
@@ -64,12 +65,48 @@ export default function Navbar() {
                     alignItems: 'center',
                     gap: '12px',
                     fontWeight: 900,
-                    // color: scrolled ? 'var(--primary)',
                     transition: 'all var(--transition-base)',
-                    textShadow: scrolled ? 'none' : '0 2px 10px rgba(0,0,0,0.3)',
                 }}>
-                    <Image src="/logo.png" alt="Logo" width={42} height={42} />
-                    <span style={{ letterSpacing: '-0.02em', fontSize: '1.25rem' }}>Niger<span style={{ color: 'var(--gold)' }}>Sanitary</span></span>
+                    <div style={{
+                        position: 'relative',
+                        width: '42px',
+                        height: '42px',
+                        background: scrolled ? 'var(--primary-50)' : 'rgba(255, 255, 255, 0.15)',
+                        borderRadius: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: scrolled ? '0 4px 10px rgba(0,0,0,0.05)' : 'none',
+                        border: scrolled ? '1px solid var(--primary-100)' : '1px solid rgba(255, 255, 255, 0.3)',
+                        padding: '4px',
+                        backdropFilter: scrolled ? 'none' : 'blur(10px)'
+                    }}>
+                        <Image
+                            src="/logo.png"
+                            alt="Niger Sanitary Industry Limited"
+                            width={32}
+                            height={32}
+                        />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
+                        <span style={{
+                            letterSpacing: '-0.01em',
+                            fontSize: '1.1rem',
+                            color: 'var(--primary-dark)',
+                            textShadow: scrolled ? 'none' : '0 2px 4px rgba(0,0,0,0.2)'
+                        }}>
+                            Niger <span style={{ color: 'var(--gold)' }}>Sanitary</span>
+                        </span>
+                        <span style={{
+                            fontSize: '0.625rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.1em',
+                            color: 'var(--gray-500)',
+                            fontWeight: 700
+                        }}>
+                            Industry Limited
+                        </span>
+                    </div>
                 </Link>
 
                 {/* Desktop Nav */}
@@ -169,7 +206,7 @@ export default function Navbar() {
                         display: 'none',
                         background: 'none',
                         border: 'none',
-                        color:  'var(--gray-800)',
+                        color: 'var(--gray-800)',
                         cursor: 'pointer',
                         padding: '8px',
                     }}

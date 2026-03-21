@@ -10,9 +10,17 @@ interface ModalProps {
     title?: string;
     children: React.ReactNode;
     maxWidth?: string;
+    closeOnOverlayClick?: boolean;
 }
 
-export default function Modal({ isOpen, onClose, title, children, maxWidth = '600px' }: ModalProps) {
+export default function Modal({
+    isOpen,
+    onClose,
+    title,
+    children,
+    maxWidth = '600px',
+    closeOnOverlayClick = true
+}: ModalProps) {
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
@@ -38,7 +46,7 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = '60
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        onClick={onClose}
+                        onClick={closeOnOverlayClick ? onClose : undefined}
                         style={{
                             position: 'absolute',
                             inset: 0,

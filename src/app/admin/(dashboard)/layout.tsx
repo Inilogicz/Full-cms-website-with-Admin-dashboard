@@ -20,6 +20,7 @@ import {
     ChevronLeft,
     Bell,
     Settings,
+    MapPin,
 } from 'lucide-react';
 
 const sidebarLinks = [
@@ -31,6 +32,7 @@ const sidebarLinks = [
     { name: 'Distributor Leads', href: '/admin/leads', icon: Users },
     { name: 'Subscribers', href: '/admin/subscribers', icon: Mail },
     { name: 'Media Manager', href: '/admin/media', icon: Upload },
+    { name: 'Stores', href: '/admin/stores', icon: MapPin },
     { name: 'FAQ', href: '/admin/faq', icon: HelpCircle },
 ];
 

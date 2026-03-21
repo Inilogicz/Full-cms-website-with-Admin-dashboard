@@ -125,3 +125,16 @@ model Certificate {
   fileUrl     String?
   createdAt   DateTime @default(now())
 }
+
+model Store {
+  id        String   @id @default(cuid())
+  name      String
+  address   String
+  city      String
+  state     String
+  phone     String?
+  email     String?
+  status    String   @default("published") // draft, published, archived
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

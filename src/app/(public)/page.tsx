@@ -20,6 +20,8 @@ import {
   Zap,
 } from 'lucide-react';
 
+import FloatingProductBackground from '@/components/shared/FloatingProductBackground';
+
 // Custom Crafted Icons
 const CraftedShield = () => (
   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -144,6 +146,18 @@ export default function HomePage() {
           overflow: 'hidden',
         }}
       >
+        {/* Brand Visual Layer */}
+        <FloatingProductBackground
+          theme="light"
+          intensity={60}
+          images={[
+            { url: '/product1.JPG', top: '12%', left: '4%', size: '130px', mobileSize: '70px', delay: 0.2, opacity: 0.25 },
+            { url: '/product6.JPG', top: '75%', left: '6%', size: '160px', mobileSize: '90px', delay: 0.6, opacity: 0.3 },
+            { url: '/product10.JPG', top: '15%', left: '88%', size: '145px', mobileSize: '80px', delay: 1.0, opacity: 0.25 },
+            { url: '/product4.JPG', top: '80%', left: '85%', size: '170px', mobileSize: '95px', delay: 1.4, opacity: 0.3 },
+          ]}
+        />
+
         {/* Dynamic Background Elements */}
         <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
           {/* Animated Mesh/Grid */}
@@ -155,7 +169,7 @@ export default function HomePage() {
             opacity: 0.5,
           }} />
 
-          {/* Large Background Decorative Text (Visible on Mobile for depth) */}
+          {/* Large Background Decorative Text */}
           <div style={{
             position: 'absolute',
             top: '15%',
@@ -164,7 +178,7 @@ export default function HomePage() {
             fontSize: 'clamp(5rem, 20vw, 12rem)',
             fontWeight: 900,
             color: 'transparent',
-            WebkitTextStroke: '1.5px rgba(10, 77, 162, 0.05)',
+            WebkitTextStroke: '1.5px rgba(10, 77, 162, 0.03)',
             whiteSpace: 'nowrap',
             zIndex: 0,
             pointerEvents: 'none',
@@ -181,7 +195,7 @@ export default function HomePage() {
             fontSize: 'clamp(5rem, 20vw, 12rem)',
             fontWeight: 900,
             color: 'transparent',
-            WebkitTextStroke: '1.5px rgba(212, 175, 55, 0.05)',
+            WebkitTextStroke: '1.5px rgba(212, 175, 55, 0.03)',
             whiteSpace: 'nowrap',
             zIndex: 0,
             pointerEvents: 'none',
@@ -189,44 +203,6 @@ export default function HomePage() {
           }}>
             EXCELLENCE
           </div>
-
-          {/* Morphing Blobs */}
-          <motion.div
-            animate={{
-              scale: [1, 1.2, 1],
-              x: [0, 100, 0],
-              y: [0, -50, 0],
-            }}
-            transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
-            style={{
-              position: 'absolute',
-              top: '-10%',
-              left: '-10%',
-              width: '600px',
-              height: '600px',
-              background: 'radial-gradient(circle, rgba(10, 77, 162, 0.08) 0%, transparent 70%)',
-              filter: 'blur(80px)',
-              borderRadius: '50%',
-            }}
-          />
-          <motion.div
-            animate={{
-              scale: [1, 1.3, 1],
-              x: [0, -120, 0],
-              y: [0, 80, 0],
-            }}
-            transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-            style={{
-              position: 'absolute',
-              bottom: '-15%',
-              right: '-5%',
-              width: '700px',
-              height: '700px',
-              background: 'radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%)',
-              filter: 'blur(100px)',
-              borderRadius: '50%',
-            }}
-          />
         </div>
 
         {/* Floating Icons (Mobile & Desktop) */}
@@ -274,65 +250,76 @@ export default function HomePage() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '8px',
-                  background: 'white',
+                  background: 'var(--primary-50)',
                   borderRadius: 'var(--radius-full)',
-                  padding: '8px 20px',
+                  padding: '10px 24px',
                   marginBottom: '32px',
                   color: 'var(--primary-dark)',
-                  fontWeight: 800,
-                  fontSize: '0.8125rem',
+                  fontWeight: 900,
+                  fontSize: '0.875rem',
                   boxShadow: '0 4px 20px rgba(10, 77, 162, 0.08)',
-                  border: '1px solid var(--gray-100)',
+                  border: '1px solid var(--primary-100)',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.08em'
+                  letterSpacing: '0.1em'
                 }}
               >
-                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--gold)', boxShadow: '0 0 10px var(--gold)' }} />
-                Premium Manufacturing Leader
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--primary)', boxShadow: '0 0 10px var(--primary)' }} />
+                Pioneering Health & Hygiene
               </motion.div>
 
               <h1 style={{
-                fontSize: 'clamp(2.75rem, 8vw, 4.8rem)',
-                fontWeight: 900,
-                lineHeight: 1.05,
-                letterSpacing: '-0.02em',
-                marginBottom: '24px',
+                fontSize: 'clamp(2.2rem, 5.5vw, 4rem)',
+                fontWeight: 950,
+                lineHeight: 1.1,
+                letterSpacing: '-0.03em',
+                marginBottom: '28px',
                 color: 'var(--primary-dark)',
               }}>
-                Redefining <br />
-                <span className="text-gradient-gold" style={{ filter: 'drop-shadow(0 0 20px rgba(212, 175, 55, 0.2))' }}>Standard of Care</span> <br />
-                <span style={{ fontSize: '0.4em', verticalAlign: 'middle', opacity: 0.5, fontWeight: 300, letterSpacing: '0.15em', textTransform: 'uppercase', display: 'block', marginTop: '12px' }}>Empowering Millions Since 1999</span>
+                Nigeria&apos;s Leading Producer of <br />
+                <span className="text-primary" style={{ position: 'relative' }}>
+                  Sanitary Pads & Medical Consumables
+                  <motion.div
+                    initial={{ width: 0 }}
+                    whileInView={{ width: '100%' }}
+                    transition={{ duration: 0.8, delay: 1 }}
+                    style={{ position: 'absolute', bottom: '5px', left: 0, height: '8px', background: 'var(--primary-100)', zIndex: -1, opacity: 0.5 }}
+                  />
+                </span>
+                <br />
+                <span style={{ fontSize: '0.32em', verticalAlign: 'middle', color: 'var(--gray-500)', fontWeight: 500, letterSpacing: '0.2em', textTransform: 'uppercase', display: 'block', marginTop: '16px' }}>Empowering Millions Since 1999</span>
               </h1>
 
               <p style={{
                 color: 'var(--gray-600)',
-                fontSize: '1.25rem',
-                lineHeight: 1.6,
+                fontSize: 'clamp(1.125rem, 2vw, 1.3rem)',
+                lineHeight: 1.7,
                 marginBottom: '48px',
-                maxWidth: '600px',
+                maxWidth: '680px',
                 fontWeight: 500,
               }}>
-                Precision engineering meets clinical trust. We deliver cutting-edge healthcare manufacturing solutions across the West African region.
+                Quality, Affordable, and Trusted brands for Hospitals, Health Centres, and Households.
               </p>
 
               <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }} className="hero-button-group">
                 <Link href="/products" className="btn btn-lg" style={{
-                  background: 'var(--gradient-primary)',
+                  background: 'var(--primary)',
                   color: 'white',
-                  padding: '18px 44px',
+                  padding: '20px 48px',
                   borderRadius: 'var(--radius-full)',
-                  boxShadow: '0 12px 30px rgba(10, 77, 162, 0.25)',
+                  boxShadow: '0 15px 35px rgba(10, 77, 162, 0.3)',
                   overflow: 'hidden',
-                  position: 'relative'
+                  position: 'relative',
+                  fontWeight: 800,
+                  fontSize: '1.0625rem'
                 }}>
-                  <span style={{ position: 'relative', zIndex: 1 }}>Explore Our Products</span>
+                  <span style={{ position: 'relative', zIndex: 1 }}>Explore Collection</span>
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
                     style={{
                       position: 'absolute',
                       inset: '-50%',
-                      background: 'conic-gradient(from 0deg, transparent 0% 80%, rgba(255,255,255,0.2) 100%)',
+                      background: 'conic-gradient(from 0deg, transparent 0% 80%, rgba(255,255,255,0.15) 100%)',
                       zIndex: 0,
                     }}
                   />
@@ -340,10 +327,12 @@ export default function HomePage() {
                 <Link href="/about" className="btn btn-lg" style={{
                   borderRadius: 'var(--radius-full)',
                   background: 'white',
-                  border: '1.5px solid var(--gray-200)',
-                  color: 'var(--gray-700)',
-                  padding: '18px 44px',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+                  border: '2px solid var(--primary-100)',
+                  color: 'var(--primary-dark)',
+                  padding: '20px 48px',
+                  boxShadow: '0 4px 15px rgba(10, 77, 162, 0.05)',
+                  fontWeight: 800,
+                  fontSize: '1.0625rem'
                 }}>
                   Our Heritage
                 </Link>
@@ -363,13 +352,13 @@ export default function HomePage() {
                   borderRadius: '40px',
                   overflow: 'hidden',
                   aspectRatio: '0.85',
-                  // boxShadow: '0 50px 100px -20px rgba(10, 77, 162, 0.2)',
+                  boxShadow: '0 50px 100px -20px rgba(10, 77, 162, 0.25)',
                   border: '12px solid white',
                   background: 'white',
                   position: 'relative',
                   zIndex: 2,
                 }}>
-                  <img src="/hero.png" alt="State of the art facility" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src="/product6.JPG" alt="Trusted Nigerian Healthcare Manufacturer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   <div style={{
                     position: 'absolute',
                     inset: 0,
