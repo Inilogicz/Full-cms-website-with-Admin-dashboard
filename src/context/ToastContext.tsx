@@ -53,6 +53,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                             key={toast.id}
                             type={toast.type}
                             message={toast.message}
+                            duration={5000}
                             onClose={() => removeToast(toast.id)}
                         />
                     ))}

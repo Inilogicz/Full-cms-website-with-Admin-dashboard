@@ -33,20 +33,20 @@ export default function AdminSubscribersPage() {
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                <h1 style={{ fontSize: '1.5rem' }}>Newsletter Subscribers</h1>
-                <span className="badge badge-primary" style={{ padding: '8px 16px' }}>
-                    <Mail size={14} style={{ marginRight: '4px' }} />
-                    {subscribers.length} Subscribers
+            <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+                <h1 style={{ fontSize: '1.5rem', margin: 0 }}>Newsletter Subscribers</h1>
+                <span className="badge badge-primary" style={{ padding: '8px 16px', display: 'flex', alignItems: 'center' }}>
+                    <Mail size={14} style={{ marginRight: '6px' }} />
+                    <span style={{ fontWeight: 600 }}>{subscribers.length} Subscribers</span>
                 </span>
             </div>
 
-            <div style={{ position: 'relative', marginBottom: '20px', maxWidth: '320px' }}>
+            <div className="search-container" style={{ position: 'relative', marginBottom: '24px', maxWidth: '400px', width: '100%' }}>
                 <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--gray-400)' }} />
                 <input
                     className="form-input"
                     style={{ paddingLeft: '40px' }}
-                    placeholder="Search..."
+                    placeholder="Search by email..."
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                 />
@@ -60,8 +60,8 @@ export default function AdminSubscribersPage() {
                         <thead>
                             <tr>
                                 <th>Email</th>
-                                <th>Status</th>
-                                <th>Subscribed Date</th>
+                                <th className="hide-mobile">Status</th>
+                                <th className="hide-mobile">Subscribed Date</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -74,13 +74,18 @@ export default function AdminSubscribersPage() {
                             ) : (
                                 filtered.map(sub => (
                                     <tr key={sub.id}>
-                                        <td style={{ fontWeight: 500 }}>{sub.email}</td>
                                         <td>
+                                            <div style={{ fontWeight: 600, color: 'var(--gray-900)' }}>{sub.email}</div>
+                                            <div className="show-mobile" style={{ display: 'none', fontSize: '0.75rem', color: 'var(--gray-400)', marginTop: '4px' }}>
+                                                {new Date(sub.createdAt).toLocaleDateString()} • {sub.active !== false ? 'Active' : 'Inactive'}
+                                            </div>
+                                        </td>
+                                        <td className="hide-mobile">
                                             <span className={`badge badge-${sub.active !== false ? 'success' : 'warning'}`}>
                                                 {sub.active !== false ? 'Active' : 'Inactive'}
                                             </span>
                                         </td>
-                                        <td style={{ fontSize: '0.8125rem', color: 'var(--gray-400)' }}>
+                                        <td className="hide-mobile" style={{ fontSize: '0.8125rem', color: 'var(--gray-400)' }}>
                                             {new Date(sub.createdAt).toLocaleDateString()}
                                         </td>
                                     </tr>
@@ -90,6 +95,14 @@ export default function AdminSubscribersPage() {
                     </table>
                 </div>
             )}
+
+            <style jsx>{`
+                @media (max-width: 640px) {
+                    .hide-mobile { display: none !important; }
+                    .show-mobile { display: block !important; }
+                    .page-header h1 { font-size: 1.25rem !important; }
+                }
+            `}</style>
         </div>
     );
 }

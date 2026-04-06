@@ -102,17 +102,22 @@ export default function AdminStoresPage() {
             .finally(() => setIsDeleting(false));
     }
 
+    const [showUnsavedModal, setShowUnsavedModal] = useState(false);
+
     function handleClose() {
         if (isDirty) {
-            if (confirm('You have unsaved changes. Are you sure you want to close?')) {
-                setShowForm(false);
-                setEditing(null);
-                setIsDirty(false);
-            }
+            setShowUnsavedModal(true);
         } else {
             setShowForm(false);
             setEditing(null);
         }
+    }
+
+    function confirmDiscard() {
+        setShowUnsavedModal(false);
+        setShowForm(false);
+        setEditing(null);
+        setIsDirty(false);
     }
 
     const filtered = stores.filter(s =>
@@ -131,6 +136,16 @@ export default function AdminStoresPage() {
                 message="Are you sure you want to delete this store location? This action cannot be undone."
                 confirmText="Delete Store"
                 isLoading={isDeleting}
+            />
+
+            <ConfirmModal
+                isOpen={showUnsavedModal}
+                onClose={() => setShowUnsavedModal(false)}
+                onConfirm={confirmDiscard}
+                title="Unsaved Changes"
+                message="You have unsaved changes. Are you sure you want to close without saving?"
+                confirmText="Discard Changes"
+                variant="warning"
             />
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
@@ -159,7 +174,7 @@ export default function AdminStoresPage() {
                         <label className="form-label">Store Name *</label>
                         <div style={{ position: 'relative' }}>
                             <MapPin size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--gray-400)' }} />
-                            <input name="name" className="form-input" style={{ paddingLeft: '36px' }} required defaultValue={editing?.name} placeholder="e.g. Niger Sanitary Lagos Outlet" />
+                            <input name="name" className="form-input" style={{ paddingLeft: '36px' }} required defaultValue={editing?.name} placeholder="e.g. Niger Sanitary Industry Limited Lagos Outlet" />
                         </div>
                     </div>
 
@@ -211,11 +226,30 @@ export default function AdminStoresPage() {
                     <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '32px', paddingTop: '20px', borderTop: '1px solid var(--gray-100)' }}>
                         <button type="button" className="btn btn-ghost" onClick={handleClose} disabled={isSaving}>Cancel</button>
                         <button type="submit" className="btn btn-primary" disabled={isSaving}>
-                            {isSaving ? 'Saving...' : editing ? 'Update Store' : 'Create Store'}
+                            {isSaving ? (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <div className="spinner-small" />
+                                    <span>Saving...</span>
+                                </div>
+                            ) : editing ? 'Update Store' : 'Create Store'}
                         </button>
                     </div>
                 </form>
             </Modal>
+
+            <style jsx global>{`
+                .spinner-small {
+                    width: 16px;
+                    height: 16px;
+                    border: 2px solid rgba(0,0,0,0.1);
+                    border-top-color: var(--primary);
+                    border-radius: 50%;
+                    animation: spin 0.8s linear infinite;
+                }
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+            `}</style>
 
             {/* Table */}
             {loading ? (

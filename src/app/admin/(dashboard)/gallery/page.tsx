@@ -119,17 +119,25 @@ export default function AdminGalleryPage() {
                 confirmText="Remove Item"
                 isLoading={isDeleting}
             />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
-                <h1 style={{ fontSize: '1.5rem' }}>Gallery Management</h1>
+            <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+                <h1 style={{ fontSize: '1.5rem', margin: 0 }}>Gallery Management</h1>
                 <button className="btn btn-primary" onClick={() => setShowForm(true)}>
-                    <Plus size={16} /> Add Image
+                    <Plus size={16} /> <span className="btn-text">Add Image</span>
                 </button>
             </div>
 
-            <div style={{ position: 'relative', marginBottom: '20px', maxWidth: '320px' }}>
+            <div className="search-container" style={{ position: 'relative', marginBottom: '24px', maxWidth: '400px', width: '100%' }}>
                 <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--gray-400)' }} />
                 <input className="form-input" style={{ paddingLeft: '40px' }} placeholder="Search caption..." value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
+
+            <style jsx>{`
+                @media (max-width: 640px) {
+                    .btn-text { display: none; }
+                    .btn { padding: 10px !important; }
+                    .page-header h1 { font-size: 1.25rem !important; }
+                }
+            `}</style>
 
             {showForm && (
                 <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => !uploading && setShowForm(false)}>

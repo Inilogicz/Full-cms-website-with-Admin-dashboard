@@ -138,3 +138,44 @@ model Store {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model HomeConfig {
+  id              String   @id @default("global")
+  
+  // Hero Section
+  heroTitle       String   @default("Nigeria's Leading Producer of Sanitary Pads & Medical Consumables")
+  heroSubtitle    String   @default("Quality, Affordable, and Trusted brands for Hospitals, Health Centres, and Households.")
+  heroDescription String?  @db.Text
+  heroImage       String?  // Main hero image URL
+  heroImages      Json?    // DEPRECATED: Mapping compatibility workaround
+  
+  // Stats Section
+  stats           Json?    // Array of { label, value, icon, desc, color }
+  
+  // Features Section
+  features        Json?    // Array of { title, description, icon }
+
+  // About Section
+  aboutTitle      String   @default("Manufacturing Excellence")
+  aboutSubtitle   String   @default("Sustainable Production")
+  aboutDescription String? @default("Our ultra-modern facility in Niger State utilizes automated systems to ensure every product meets pharmaceutical-grade hygiene standards.") @db.Text
+  aboutImage      String?  @default("/hero-bg.jpg")
+  aboutEstablishedText String @default("Established Since 1999")
+  aboutVision      String   @default("To be the Market Leader in the production and Distribution of Quality and Affordable Sanitary pads and proximate Medical Devices in Nigeria and the West Coast.")
+  aboutMission     String   @default("To be the Market Leader in the production and Distribution of Quality and Affordable Sanitary pads and proximate Medical Devices in Nigeria and the West Coast.")
+  aboutQuote       String   @default("Often being recommended as part of the Hospital child delivery list.")
+  aboutHeritageStats Json?    // Array of { label, value, icon }
+  aboutHeritageImages Json?   // Array of strings (image URLs)
+  aboutStatBadgeValue String @default("25+")
+  aboutStatBadgeLabel String @default("Years of Excellence")
+  aboutLadySeptFeatures Json? // Array of strings
+  aboutFutureText   String?  @db.Text
+  aboutSupportTitle String   @default("We ensure that no one loses confidence because of their gender.")
+  aboutSupportDescription String? @db.Text
+  
+  // Social & Contact
+  socialLinks     Json?    // { facebook, twitter, instagram, linkedin, whatsapp }
+  contactInfo     Json?    // { email, phone, address, workingHours }
+  
+  updatedAt       DateTime @updatedAt
+}

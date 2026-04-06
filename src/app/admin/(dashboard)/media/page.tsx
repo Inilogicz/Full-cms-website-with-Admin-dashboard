@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Upload, Trash2, Image as ImageIcon, Search, Copy, Check } from 'lucide-react';
+import ConfirmModal from '@/components/ui/ConfirmModal';
 
 interface MediaItem {
     id: string; cloudinaryUrl: string; publicId: string; altText: string;
@@ -12,12 +13,16 @@ export default function AdminMediaPage() {
     const [media, setMedia] = useState<MediaItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
     const [search, setSearch] = useState('');
     const [copied, setCopied] = useState<string | null>(null);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => { fetchMedia(); }, []);
 
     function fetchMedia() {
+        setLoading(true);
         fetch('/api/media')
             .then(res => res.json())
             .then(data => setMedia(data))
@@ -26,18 +31,24 @@ export default function AdminMediaPage() {
     }
 
     function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+        // ... (rest of handleUpload remains same as previous update)
         const files = e.target.files;
         if (!files?.length) return;
+        
         setUploading(true);
+        setUploadProgress({ current: 1, total: files.length });
 
         const fileList = Array.from(files);
         const uploadNext = (index: number) => {
             if (index >= fileList.length) {
                 setUploading(false);
+                setUploadProgress({ current: 0, total: 0 });
                 fetchMedia();
                 e.target.value = '';
                 return;
             }
+
+            setUploadProgress({ current: index + 1, total: fileList.length });
 
             const formData = new FormData();
             formData.append('file', fileList[index]);
@@ -51,11 +62,16 @@ export default function AdminMediaPage() {
         uploadNext(0);
     }
 
-    function handleDelete(id: string) {
-        if (!confirm('Delete this image from Cloudinary and database?')) return;
-        fetch(`/api/media/${id}`, { method: 'DELETE' })
-            .then(() => fetchMedia())
-            .catch(() => { /* */ });
+    function handleDelete() {
+        if (!deletingId) return;
+        setIsDeleting(true);
+        fetch(`/api/media/${deletingId}`, { method: 'DELETE' })
+            .then(() => {
+                setDeletingId(null);
+                fetchMedia();
+            })
+            .catch(() => { /* */ })
+            .finally(() => setIsDeleting(false));
     }
 
     function copyUrl(url: string, id: string) {
@@ -77,7 +93,7 @@ export default function AdminMediaPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                 <h1 style={{ fontSize: '1.5rem' }}>Media Manager</h1>
                 <label className="btn btn-primary" style={{ cursor: 'pointer' }}>
-                    <Upload size={16} /> {uploading ? 'Uploading...' : 'Upload Images'}
+                    <Upload size={16} /> {uploading ? `Uploading ${uploadProgress.current}/${uploadProgress.total}...` : 'Upload Images'}
                     <input type="file" accept="image/*" multiple onChange={handleUpload} style={{ display: 'none' }} disabled={uploading} />
                 </label>
             </div>
@@ -112,7 +128,7 @@ export default function AdminMediaPage() {
                                     <button className="btn btn-ghost btn-sm" style={{ flex: 1 }} onClick={() => copyUrl(item.cloudinaryUrl, item.id)}>
                                         {copied === item.id ? <><Check size={12} /> Copied</> : <><Copy size={12} /> URL</>}
                                     </button>
-                                    <button className="btn btn-ghost btn-sm" style={{ color: 'var(--error)' }} onClick={() => handleDelete(item.id)}>
+                                    <button className="btn btn-ghost btn-sm" style={{ color: 'var(--error)' }} onClick={() => setDeletingId(item.id)}>
                                         <Trash2 size={12} />
                                     </button>
                                 </div>
@@ -121,6 +137,16 @@ export default function AdminMediaPage() {
                     ))}
                 </div>
             )}
+
+            <ConfirmModal 
+                isOpen={!!deletingId}
+                title="Delete Media"
+                message="Are you sure you want to delete this image? This action cannot be undone and will remove it from Cloudinary and the database."
+                onConfirm={handleDelete}
+                onClose={() => setDeletingId(null)}
+                confirmText="Delete"
+                isLoading={isDeleting}
+            />
         </div>
     );
 }

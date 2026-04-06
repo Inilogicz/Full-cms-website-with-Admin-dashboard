@@ -5,21 +5,29 @@ import { verifyPassword, generateToken } from '@/lib/auth';
 export async function POST(req: NextRequest) {
     try {
         const { email, password } = await req.json();
+        const normalizedEmail = email.toLowerCase().trim();
 
-        if (!email || !password) {
+        if (!normalizedEmail || !password) {
             return NextResponse.json({ error: 'Email and password required' }, { status: 400 });
         }
 
-        const admin = await prisma.admin.findUnique({ where: { email } });
+        console.log(`[Auth] Login attempt for email: ${normalizedEmail}`);
+        const admin = await prisma.admin.findUnique({ where: { email: normalizedEmail } });
+        
         if (!admin) {
+            console.log(`[Auth] Admin user not found for email: ${email}`);
             return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
         }
 
+        console.log(`[Auth] Admin user found: ${admin.email}. Verifying password...`);
         const valid = await verifyPassword(password, admin.passwordHash);
+        
         if (!valid) {
+            console.log(`[Auth] Password mismatch for email: ${email}`);
             return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
         }
 
+        console.log(`[Auth] Login successful for email: ${email}`);
         const token = generateToken({ id: admin.id, email: admin.email, name: admin.name });
 
         const response = NextResponse.json({ success: true, admin: { id: admin.id, email: admin.email, name: admin.name } });

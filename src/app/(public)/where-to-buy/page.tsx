@@ -124,7 +124,7 @@ export default function WhereToBuyPage() {
                             lineHeight: 1.6,
                             fontWeight: 500
                         }}>
-                            Find Niger Sanitary products at authorized retailers and distributors near you across all 36 states in Nigeria.
+                            Find Niger Sanitary Industry Limited products at authorized retailers and distributors near you across all 36 states in Nigeria.
                         </p>
                     </motion.div>
                 </div>

@@ -35,6 +35,7 @@ export default function AdminEventsPage() {
     const [selectedImages, setSelectedImages] = useState<Media[]>([]);
     const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
     function fetchEvents() {
         setLoading(true);
@@ -115,14 +116,14 @@ export default function AdminEventsPage() {
                 confirmText="Delete Event"
                 isLoading={isDeleting}
             />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+            <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
                 <h1 style={{ fontSize: '1.5rem', margin: 0 }}>Events</h1>
                 <button className="btn btn-primary" onClick={() => { setEditing(null); setSelectedImages([]); setShowForm(true); }}>
-                    <Plus size={16} /> New Event
+                    <Plus size={16} /> <span className="btn-text">New Event</span>
                 </button>
             </div>
 
-            <div style={{ position: 'relative', marginBottom: '20px', maxWidth: '320px' }}>
+            <div className="search-container" style={{ position: 'relative', marginBottom: '24px', maxWidth: '400px', width: '100%' }}>
                 <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--gray-400)' }} />
                 <input className="form-input" style={{ paddingLeft: '40px' }} placeholder="Search events..." value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
@@ -204,34 +205,95 @@ export default function AdminEventsPage() {
                 </div>
             )}
 
+            {/* Event Detail Modal */}
+            {selectedEvent && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setSelectedEvent(null)}>
+                    <div className="card" style={{ width: '100%', maxWidth: '500px', maxHeight: '90vh', overflow: 'auto', padding: '24px' }} onClick={e => e.stopPropagation()}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                            <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Event Details</h2>
+                            <button className="btn btn-ghost btn-icon" onClick={() => setSelectedEvent(null)}><X size={20} /></button>
+                        </div>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            <div style={{ width: '100%', aspectRatio: '16/10', borderRadius: 'var(--radius-lg)', overflow: 'hidden', background: 'var(--gray-100)' }}>
+                                {selectedEvent.images?.[0] ? 
+                                    <img src={selectedEvent.images[0].cloudinaryUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 
+                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gray-300)' }}><ImageIcon size={48} /></div>
+                                }
+                            </div>
+                            
+                            <div>
+                                <label style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase' }}>Title</label>
+                                <div style={{ fontSize: '1.125rem', fontWeight: 600 }}>{selectedEvent.title}</div>
+                            </div>
+                            
+                            <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+                                <div>
+                                    <label style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase' }}>Date</label>
+                                    <div style={{ fontSize: '0.9375rem' }}>{new Date(selectedEvent.eventDate).toLocaleDateString()}</div>
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase' }}>Status</label>
+                                    <div><span className={`badge badge-${selectedEvent.status === 'published' ? 'success' : 'warning'}`}>{selectedEvent.status}</span></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase' }}>Location</label>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9375rem' }}>
+                                    <MapPin size={16} className="text-primary" /> {selectedEvent.location || 'N/A'}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase' }}>Description</label>
+                                <p style={{ fontSize: '0.9375rem', color: 'var(--gray-600)', lineHeight: 1.6, marginTop: '4px' }}>{selectedEvent.description}</p>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+                                <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => { setEditing(selectedEvent); setSelectedEvent(null); setShowForm(true); }}>
+                                    <Edit2 size={16} /> Edit
+                                </button>
+                                <button className="btn btn-outline" style={{ flex: 1, borderColor: 'var(--error)', color: 'var(--error)' }} onClick={() => { setConfirmDelete(selectedEvent.id); setSelectedEvent(null); }}>
+                                    <Trash2 size={16} /> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {loading ? (
                 <TableSkeleton cols={5} rows={6} />
             ) : (
                 <div className="table-container">
                     <table className="table">
                         <thead>
-                            <tr><th>Event</th><th>Date</th><th>Location</th><th>Status</th><th>Actions</th></tr>
+                            <tr><th>Event</th><th className="hide-mobile">Date</th><th className="hide-mobile">Location</th><th className="hide-mobile">Status</th><th>Actions</th></tr>
                         </thead>
                         <tbody>
                             {filtered.length === 0 ? (
                                 <tr><td colSpan={5} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '40px' }}>No events found</td></tr>
-                            ) : filtered.map(e => (
-                                <tr key={e.id}>
+                            ) : filtered.map(evt => (
+                                <tr key={evt.id} className="table-row" onClick={() => { if (window.innerWidth <= 768) setSelectedEvent(evt) }}>
                                     <td>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                            <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', overflow: 'hidden', background: 'var(--gray-100)', flexShrink: 0 }}>
-                                                {e.images?.[0] ? <img src={e.images[0].cloudinaryUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Calendar size={20} style={{ margin: 10, color: 'var(--gray-300)' }} />}
+                                            <div style={{ width: 44, height: 44, borderRadius: 'var(--radius-md)', overflow: 'hidden', background: 'var(--gray-100)', flexShrink: 0 }}>
+                                                {evt.images?.[0] ? <img src={evt.images[0].cloudinaryUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <Calendar size={20} style={{ margin: 12, color: 'var(--gray-300)' }} />}
                                             </div>
-                                            <span style={{ fontWeight: 500 }}>{e.title}</span>
+                                            <div>
+                                                <div style={{ fontWeight: 600, color: 'var(--gray-900)' }}>{evt.title}</div>
+                                                <div className="show-mobile" style={{ fontSize: '0.75rem', color: 'var(--gray-400)', display: 'none' }}>{new Date(evt.eventDate).toLocaleDateString()}</div>
+                                            </div>
                                         </div>
                                     </td>
-                                    <td>{new Date(e.eventDate).toLocaleDateString()}</td>
-                                    <td><div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8125rem' }}><MapPin size={12} /> {e.location || 'N/A'}</div></td>
-                                    <td><span className={`badge badge-${e.status === 'published' ? 'success' : e.status === 'draft' ? 'warning' : 'info'}`}>{e.status}</span></td>
+                                    <td className="hide-mobile">{new Date(evt.eventDate).toLocaleDateString()}</td>
+                                    <td className="hide-mobile"><div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8125rem' }}><MapPin size={12} /> {evt.location || 'N/A'}</div></td>
+                                    <td className="hide-mobile"><span className={`badge badge-${evt.status === 'published' ? 'success' : evt.status === 'draft' ? 'warning' : 'info'}`}>{evt.status}</span></td>
                                     <td>
-                                        <div style={{ display: 'flex', gap: '8px' }}>
-                                            <button className="btn btn-ghost btn-sm" onClick={() => { setEditing(e); setShowForm(true); }}><Edit2 size={14} /></button>
-                                            <button className="btn btn-ghost btn-sm" style={{ color: 'var(--error)' }} onClick={() => setConfirmDelete(e.id)}><Trash2 size={14} /></button>
+                                        <div style={{ display: 'flex', gap: '4px' }}>
+                                            <button className="btn btn-ghost btn-sm btn-icon" onClick={(e) => { e.stopPropagation(); setEditing(evt); setShowForm(true); }}><Edit2 size={14} /></button>
+                                            <button className="btn btn-ghost btn-sm btn-icon" style={{ color: 'var(--error)' }} onClick={(e) => { e.stopPropagation(); setConfirmDelete(evt.id); }}><Trash2 size={14} /></button>
                                         </div>
                                     </td>
                                 </tr>
@@ -240,6 +302,20 @@ export default function AdminEventsPage() {
                     </table>
                 </div>
             )}
+
+            <style jsx>{`
+                @media (max-width: 640px) {
+                    .hide-mobile { display: none !important; }
+                    .show-mobile { display: block !important; }
+                    .btn-text { display: none; }
+                    .btn { padding: 10px !important; }
+                    .page-header h1 { font-size: 1.25rem !important; }
+                }
+                .table-row { transition: background 0.2s ease; cursor: pointer; }
+                @media (max-width: 768px) {
+                    .table-row:hover { background: var(--gray-50); }
+                }
+            `}</style>
 
             {showMediaPicker && (
                 <MediaPicker

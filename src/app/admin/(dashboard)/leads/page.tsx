@@ -33,11 +33,11 @@ export default function AdminLeadsPage() {
 
     return (
         <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                <h1 style={{ fontSize: '1.5rem' }}>Distributor Leads</h1>
-                <span className="badge badge-primary" style={{ padding: '8px 16px' }}>{leads.length} Total Leads</span>
+            <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+                <h1 style={{ fontSize: '1.5rem', margin: 0 }}>Distributor Leads</h1>
+                <span className="badge badge-primary" style={{ padding: '8px 16px', fontWeight: 600 }}>{leads.length} Total Leads</span>
             </div>
-            <div style={{ position: 'relative', marginBottom: '20px', maxWidth: '320px' }}>
+            <div className="search-container" style={{ position: 'relative', marginBottom: '24px', maxWidth: '400px', width: '100%' }}>
                 <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--gray-400)' }} />
                 <input className="form-input" style={{ paddingLeft: '40px' }} placeholder="Search leads..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
@@ -73,15 +73,20 @@ export default function AdminLeadsPage() {
             {loading ? <div className="skeleton" style={{ height: '300px', borderRadius: 'var(--radius-lg)' }} /> : (
                 <div className="table-container">
                     <table className="table">
-                        <thead><tr><th>Company</th><th>Contact</th><th>Email</th><th>Interest</th><th>Date</th><th>Status</th></tr></thead>
+                        <thead><tr><th>Company</th><th className="hide-mobile">Contact</th><th className="hide-mobile">Email</th><th className="hide-mobile">Interest</th><th className="hide-mobile">Date</th><th>Status</th></tr></thead>
                         <tbody>
                             {filtered.length === 0 ? <tr><td colSpan={6} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '40px' }}>No leads found</td></tr> : filtered.map(lead => (
-                                <tr key={lead.id} style={{ cursor: 'pointer' }} onClick={() => setSelected(lead)}>
-                                    <td style={{ fontWeight: 500 }}>{lead.companyName}</td>
-                                    <td>{lead.contactPerson}</td>
-                                    <td style={{ fontSize: '0.8125rem' }}>{lead.email}</td>
-                                    <td><span className="badge badge-primary">{lead.distributionInterest || 'General'}</span></td>
-                                    <td style={{ fontSize: '0.8125rem', color: 'var(--gray-400)' }}>{new Date(lead.createdAt).toLocaleDateString()}</td>
+                                <tr key={lead.id} className="table-row" style={{ cursor: 'pointer' }} onClick={() => setSelected(lead)}>
+                                    <td>
+                                        <div style={{ fontWeight: 600, color: 'var(--gray-900)' }}>{lead.companyName}</div>
+                                        <div className="show-mobile" style={{ display: 'none', fontSize: '0.75rem', color: 'var(--gray-400)', marginTop: '4px' }}>
+                                            {lead.contactPerson} • {lead.distributionInterest || 'General'}
+                                        </div>
+                                    </td>
+                                    <td className="hide-mobile">{lead.contactPerson}</td>
+                                    <td className="hide-mobile" style={{ fontSize: '0.8125rem' }}>{lead.email}</td>
+                                    <td className="hide-mobile"><span className="badge badge-primary">{lead.distributionInterest || 'General'}</span></td>
+                                    <td className="hide-mobile" style={{ fontSize: '0.8125rem', color: 'var(--gray-400)' }}>{new Date(lead.createdAt).toLocaleDateString()}</td>
                                     <td><span className={`badge badge-${lead.status === 'new' ? 'info' : lead.status === 'contacted' ? 'warning' : 'success'}`}>{lead.status}</span></td>
                                 </tr>
                             ))}
@@ -89,6 +94,16 @@ export default function AdminLeadsPage() {
                     </table>
                 </div>
             )}
+
+            <style jsx>{`
+                @media (max-width: 640px) {
+                    .hide-mobile { display: none !important; }
+                    .show-mobile { display: block !important; }
+                    .page-header h1 { font-size: 1.25rem !important; }
+                }
+                .table-row { transition: background 0.2s ease; }
+                .table-row:hover { background: var(--gray-50); }
+            `}</style>
         </div>
     );
 }

@@ -23,6 +23,7 @@ export default function MediaPicker({ onSelect, onClose, currentId, allowMultipl
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [uploading, setUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
     const [localSelected, setLocalSelected] = useState<MediaItem[]>([]);
 
     useEffect(() => {
@@ -39,24 +40,43 @@ export default function MediaPicker({ onSelect, onClose, currentId, allowMultipl
     }
 
     async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
-        const file = e.target.files?.[0];
-        if (!file) return;
+        const files = e.target.files;
+        if (!files?.length) return;
 
         setUploading(true);
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('altText', file.name);
+        const fileList = Array.from(files);
+        setUploadProgress({ current: 1, total: fileList.length });
 
-        try {
-            const res = await fetch('/api/upload', { method: 'POST', body: formData });
-            const newItem = await res.json();
-            setMedia([newItem, ...media]);
-            if (!allowMultiple) {
-                onSelect(newItem);
-                onClose();
+        const newItems: MediaItem[] = [];
+        
+        for (let i = 0; i < fileList.length; i++) {
+            setUploadProgress({ current: i + 1, total: fileList.length });
+            const file = fileList[i];
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('altText', file.name);
+
+            try {
+                const res = await fetch('/api/upload', { method: 'POST', body: formData });
+                const newItem = await res.json();
+                newItems.push(newItem);
+            } catch (err) {
+                console.error('Upload failed', err);
             }
-        } catch { }
+        }
+
+        setMedia(prev => [...newItems, ...prev]);
+        
+        // Auto-select in multi-mode, or select first and close in single-mode
+        if (allowMultiple) {
+            setLocalSelected(prev => [...prev, ...newItems]);
+        } else if (newItems.length > 0) {
+            onSelect(newItems[0]);
+            onClose();
+        }
+
         setUploading(false);
+        setUploadProgress({ current: 0, total: 0 });
     }
 
     const filtered = media.filter(m => (m.altText || '').toLowerCase().includes(search.toLowerCase()));
@@ -98,8 +118,8 @@ export default function MediaPicker({ onSelect, onClose, currentId, allowMultipl
                         />
                     </div>
                     <label className="btn btn-primary" style={{ height: '40px', padding: '0 16px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                        <Upload size={16} /> {uploading ? 'Uploading...' : 'Upload New'}
-                        <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleUpload} disabled={uploading} />
+                        <Upload size={16} /> {uploading ? `Uploading ${uploadProgress.current}/${uploadProgress.total}...` : 'Upload New'}
+                        <input type="file" accept="image/*" multiple={allowMultiple} style={{ display: 'none' }} onChange={handleUpload} disabled={uploading} />
                     </label>
                 </div>
 

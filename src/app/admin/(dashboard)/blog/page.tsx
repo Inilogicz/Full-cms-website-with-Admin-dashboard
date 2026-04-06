@@ -32,6 +32,7 @@ export default function AdminBlogPage() {
     const [featuredImage, setFeaturedImage] = useState<string | null>(null);
     const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
     useEffect(() => { fetchPosts(); }, []);
 
@@ -107,12 +108,12 @@ export default function AdminBlogPage() {
                 confirmText="Delete Post"
                 isLoading={isDeleting}
             />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+            <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
                 <h1 style={{ fontSize: '1.5rem', margin: 0 }}>Blog Posts</h1>
-                <button className="btn btn-primary" onClick={() => { setEditing(null); setFeaturedImage(null); setShowForm(true); }}><Plus size={16} /> New Post</button>
+                <button className="btn btn-primary" onClick={() => { setEditing(null); setFeaturedImage(null); setShowForm(true); }}><Plus size={16} /> <span className="btn-text">New Post</span></button>
             </div>
 
-            <div style={{ position: 'relative', marginBottom: '20px', width: '100%', maxWidth: '320px' }}>
+            <div className="search-container" style={{ position: 'relative', marginBottom: '24px', width: '100%', maxWidth: '400px' }}>
                 <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--gray-400)' }} />
                 <input className="form-input" style={{ paddingLeft: '40px' }} placeholder="Search posts..." value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
@@ -184,32 +185,86 @@ export default function AdminBlogPage() {
                 </div>
             )}
 
+            {/* Post Detail Modal */}
+            {selectedPost && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setSelectedPost(null)}>
+                    <div className="card" style={{ width: '100%', maxWidth: '500px', maxHeight: '90vh', overflow: 'auto', padding: '24px' }} onClick={e => e.stopPropagation()}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                            <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Blog Details</h2>
+                            <button className="btn btn-ghost btn-icon" onClick={() => setSelectedPost(null)}><X size={20} /></button>
+                        </div>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            <div style={{ width: '100%', aspectRatio: '16/9', borderRadius: 'var(--radius-lg)', overflow: 'hidden', background: 'var(--gray-100)' }}>
+                                {selectedPost.featuredImage ? 
+                                    <img src={selectedPost.featuredImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 
+                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gray-300)' }}><ImageIcon size={48} /></div>
+                                }
+                            </div>
+                            
+                            <div>
+                                <label style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase' }}>Title</label>
+                                <div style={{ fontSize: '1.125rem', fontWeight: 600 }}>{selectedPost.title}</div>
+                            </div>
+                            
+                            <div style={{ display: 'flex', gap: '24px' }}>
+                                <div>
+                                    <label style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase' }}>Category</label>
+                                    <div><span className="badge badge-primary">{selectedPost.category}</span></div>
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase' }}>Status</label>
+                                    <div><span className={`badge badge-${selectedPost.status === 'published' ? 'success' : 'warning'}`}>{selectedPost.status}</span></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase' }}>Published Date</label>
+                                <div style={{ fontSize: '0.9375rem' }}>{new Date(selectedPost.publishedAt || selectedPost.createdAt).toLocaleDateString()}</div>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+                                <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => { setEditing(selectedPost); setSelectedPost(null); setShowForm(true); }}>
+                                    <Edit2 size={16} /> Edit
+                                </button>
+                                <button className="btn btn-outline" style={{ flex: 1, borderColor: 'var(--error)', color: 'var(--error)' }} onClick={() => { setConfirmDelete(selectedPost.id); setSelectedPost(null); }}>
+                                    <Trash2 size={16} /> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {loading ? (
                 <TableSkeleton cols={5} rows={6} />
             ) : (
                 <div className="table-container">
-                    <table className="table" style={{ minWidth: '800px' }}>
-                        <thead><tr><th>Post</th><th>Category</th><th>Status</th><th>Featured</th><th>Actions</th></tr></thead>
+                    <table className="table">
+                        <thead><tr><th>Post</th><th className="hide-mobile">Category</th><th className="hide-mobile">Status</th><th className="hide-mobile">Featured</th><th>Actions</th></tr></thead>
                         <tbody>
                             {filtered.length === 0 ? (
                                 <tr><td colSpan={5} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '40px' }}>No blog posts found</td></tr>
                             ) : filtered.map(p => (
-                                <tr key={p.id}>
+                                <tr key={p.id} className="table-row" onClick={() => { if (window.innerWidth <= 768) setSelectedPost(p) }}>
                                     <td>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                            <div style={{ width: 48, height: 32, borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: 'var(--gray-100)', flexShrink: 0 }}>
+                                            <div style={{ width: 44, height: 32, borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: 'var(--gray-100)', flexShrink: 0 }}>
                                                 {p.featuredImage ? <img src={p.featuredImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" /> : <ImageIcon size={16} style={{ margin: 8, color: 'var(--gray-300)' }} />}
                                             </div>
-                                            <span style={{ fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '300px' }}>{p.title}</span>
+                                            <div>
+                                                <div style={{ fontWeight: 600, color: 'var(--gray-900)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '300px' }}>{p.title}</div>
+                                                <div className="show-mobile" style={{ fontSize: '0.75rem', color: 'var(--gray-400)', display: 'none' }}>{p.category}</div>
+                                            </div>
                                         </div>
                                     </td>
-                                    <td><span className="badge badge-primary" style={{ whiteSpace: 'nowrap' }}>{p.category}</span></td>
-                                    <td><span className={`badge badge-${p.status === 'published' ? 'success' : p.status === 'draft' ? 'warning' : 'info'}`} style={{ whiteSpace: 'nowrap' }}>{p.status}</span></td>
-                                    <td>{p.featured ? '⭐' : '—'}</td>
+                                    <td className="hide-mobile"><span className="badge badge-primary" style={{ whiteSpace: 'nowrap' }}>{p.category}</span></td>
+                                    <td className="hide-mobile"><span className={`badge badge-${p.status === 'published' ? 'success' : p.status === 'draft' ? 'warning' : 'info'}`} style={{ whiteSpace: 'nowrap' }}>{p.status}</span></td>
+                                    <td className="hide-mobile">{p.featured ? '⭐' : '—'}</td>
                                     <td>
-                                        <div style={{ display: 'flex', gap: '8px' }}>
-                                            <button className="btn btn-ghost btn-sm" onClick={() => { setEditing(p); setShowForm(true); }}><Edit2 size={14} /></button>
-                                            <button className="btn btn-ghost btn-sm" style={{ color: 'var(--error)' }} onClick={() => setConfirmDelete(p.id)}><Trash2 size={14} /></button>
+                                        <div style={{ display: 'flex', gap: '4px' }}>
+                                            <button className="btn btn-ghost btn-sm btn-icon" onClick={(e) => { e.stopPropagation(); setEditing(p); setShowForm(true); }}><Edit2 size={14} /></button>
+                                            <button className="btn btn-ghost btn-sm btn-icon" style={{ color: 'var(--error)' }} onClick={(e) => { e.stopPropagation(); setConfirmDelete(p.id); }}><Trash2 size={14} /></button>
                                         </div>
                                     </td>
                                 </tr>
@@ -218,6 +273,20 @@ export default function AdminBlogPage() {
                     </table>
                 </div>
             )}
+
+            <style jsx>{`
+                @media (max-width: 640px) {
+                    .hide-mobile { display: none !important; }
+                    .show-mobile { display: block !important; }
+                    .btn-text { display: none; }
+                    .btn { padding: 10px !important; }
+                    .page-header h1 { font-size: 1.25rem !important; }
+                }
+                .table-row { transition: background 0.2s ease; cursor: pointer; }
+                @media (max-width: 768px) {
+                    .table-row:hover { background: var(--gray-50); }
+                }
+            `}</style>
 
             {showMediaPicker && (
                 <MediaPicker

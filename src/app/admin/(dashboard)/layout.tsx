@@ -21,16 +21,20 @@ import {
     Bell,
     Settings,
     MapPin,
+    Shield,
+    Monitor,
 } from 'lucide-react';
 
 const sidebarLinks = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+    { name: 'Homepage CMS', href: '/admin/settings', icon: Monitor },
     { name: 'Products', href: '/admin/products', icon: Package },
     { name: 'Blog', href: '/admin/blog', icon: FileText },
     { name: 'Events', href: '/admin/events', icon: Calendar },
     { name: 'Gallery', href: '/admin/gallery', icon: ImageIcon },
     { name: 'Distributor Leads', href: '/admin/leads', icon: Users },
     { name: 'Subscribers', href: '/admin/subscribers', icon: Mail },
+    { name: 'Users', href: '/admin/users', icon: Shield },
     { name: 'Media Manager', href: '/admin/media', icon: Upload },
     { name: 'Stores', href: '/admin/stores', icon: MapPin },
     { name: 'FAQ', href: '/admin/faq', icon: HelpCircle },
@@ -119,9 +123,14 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', overflow: 'hidden' }}>
                         <Image src="/logo.png" alt="Logo" width={32} height={32} style={{ borderRadius: 'var(--radius-md)', flexShrink: 0 }} />
                         {!collapsed && (
-                            <span style={{ fontWeight: 800, fontSize: '1.125rem', whiteSpace: 'nowrap', letterSpacing: '-0.02em' }}>
-                                Niger<span style={{ color: 'var(--gold)' }}>Admin</span>
-                            </span>
+                            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
+                                <span style={{ fontWeight: 800, fontSize: '1.125rem', whiteSpace: 'nowrap', letterSpacing: '-0.02em' }}>
+                                    Niger<span style={{ color: 'var(--gold)' }}>Sanitary</span>
+                                </span>
+                                <span style={{ fontSize: '0.625rem', fontWeight: 700, color: 'var(--gray-500)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                    Industry Limited
+                                </span>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -291,7 +300,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
                     </div>
                 </header>
 
-                <main style={{ flex: 1, padding: '32px' }}>
+                <main style={{ flex: 1, padding: 'var(--main-padding, 32px)', transition: 'padding 0.3s ease' }}>
                     <div className="admin-container" style={{ maxWidth: '1400px', margin: '0 auto' }}>
                         {children}
                     </div>
@@ -299,6 +308,10 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
             </div>
 
             <style jsx global>{`
+                :root {
+                    --main-padding: 32px;
+                }
+
                 @media (max-width: 1024px) {
                     .admin-sidebar {
                         transform: translateX(-100%);
@@ -312,6 +325,18 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
                     }
                     .mobile-hamburger {
                         display: block !important;
+                    }
+                    :root {
+                        --main-padding: 16px;
+                    }
+                }
+                
+                @media (max-width: 640px) {
+                    header {
+                        padding: 0 16px !important;
+                    }
+                    .admin-profile-info {
+                        display: none !important;
                     }
                 }
                 

@@ -3,8 +3,26 @@
 import Link from 'next/link';
 import { Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 export default function Footer() {
+    const [settings, setSettings] = useState<any>(null);
+
+    useEffect(() => {
+        fetch('/api/settings')
+            .then(res => res.json())
+            .then(data => {
+                if (data && !data.error) setSettings(data);
+            });
+    }, []);
+
+    const socialIcons = [
+        { key: 'facebook', icon: Facebook },
+        { key: 'twitter', icon: Twitter },
+        { key: 'linkedin', icon: Linkedin },
+        { key: 'instagram', icon: Instagram },
+    ];
+
     return (
         <footer style={{
             background: 'var(--gray-900)',
@@ -48,18 +66,24 @@ export default function Footer() {
                             Leading manufacturer of quality sanitary pads and medical consumables in Nigeria and West Africa.
                         </p>
                         <div style={{ display: 'flex', gap: '12px' }}>
-                            {[Facebook, Twitter, Linkedin, Instagram].map((Icon, i) => (
-                                <a key={i} href="#" style={{
-                                    width: 36,
-                                    height: 36,
-                                    borderRadius: 'var(--radius-md)',
-                                    background: 'rgba(255,255,255,0.08)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    color: 'var(--gray-400)',
-                                    transition: 'all var(--transition-fast)',
-                                }}>
+                            {socialIcons.map(({ key, icon: Icon }) => (
+                                <a 
+                                    key={key} 
+                                    href={settings?.socialLinks?.[key] || "#"} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    style={{
+                                        width: 36,
+                                        height: 36,
+                                        borderRadius: 'var(--radius-md)',
+                                        background: 'rgba(255,255,255,0.08)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        color: 'var(--gray-400)',
+                                        transition: 'all var(--transition-fast)',
+                                    }}
+                                >
                                     <Icon size={16} />
                                 </a>
                             ))}
@@ -108,15 +132,15 @@ export default function Footer() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                             <div style={{ display: 'flex', gap: '12px', fontSize: '0.875rem' }}>
                                 <MapPin size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
-                                <span>No 1 Damson street, off Akilo Road, ogba industrial scheme, Lagos, Nigeria.</span>
+                                <span>{settings?.contactInfo?.address || "No 1 Damson street, off Akilo Road, ogba industrial scheme, Lagos, Nigeria."}</span>
                             </div>
                             <div style={{ display: 'flex', gap: '12px', fontSize: '0.875rem' }}>
                                 <Phone size={18} style={{ flexShrink: 0 }} />
-                                <span>+234 906 8704 615</span>
+                                <span>{settings?.contactInfo?.phone || "+234 906 8704 615"}</span>
                             </div>
                             <div style={{ display: 'flex', gap: '12px', fontSize: '0.875rem' }}>
                                 <Mail size={18} style={{ flexShrink: 0 }} />
-                                <span>nigersanitaryindustrylimited@ymail.com</span>
+                                <span>{settings?.contactInfo?.email || "nigersanitaryindustrylimited@ymail.com"}</span>
                             </div>
                         </div>
                     </div>

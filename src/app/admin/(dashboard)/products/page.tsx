@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Search, Image as ImageIcon, X } from 'lucide-react';
 import MediaPicker from '@/components/admin/MediaPicker';
+import ConfirmModal from '@/components/ui/ConfirmModal';
 
 interface Media {
     id: string;
@@ -25,10 +26,15 @@ export default function AdminProductsPage() {
     const [search, setSearch] = useState('');
     const [showMediaPicker, setShowMediaPicker] = useState(false);
     const [selectedImages, setSelectedImages] = useState<Media[]>([]);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => { fetchProducts(); }, []);
 
     function fetchProducts() {
+        setLoading(true);
         fetch('/api/products')
             .then(res => res.json())
             .then(data => setProducts(data))
@@ -46,6 +52,7 @@ export default function AdminProductsPage() {
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        setIsSaving(true);
         const formData = new FormData(e.currentTarget);
         const data = {
             name: formData.get('name'),
@@ -70,29 +77,35 @@ export default function AdminProductsPage() {
                 setEditing(null);
                 fetchProducts();
             })
-            .catch(() => { /* */ });
+            .catch(() => { /* */ })
+            .finally(() => setIsSaving(false));
     }
 
-    function handleDelete(id: string) {
-        if (!confirm('Delete this product?')) return;
-        fetch(`/api/products/${id}`, { method: 'DELETE' })
-            .then(() => fetchProducts())
-            .catch(() => { /* */ });
+    function handleDelete() {
+        if (!deletingId) return;
+        setIsDeleting(true);
+        fetch(`/api/products/${deletingId}`, { method: 'DELETE' })
+            .then(() => {
+                setDeletingId(null);
+                fetchProducts();
+            })
+            .catch(() => { /* */ })
+            .finally(() => setIsDeleting(false));
     }
 
     const filtered = products.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
 
     return (
-        <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                <h1 style={{ fontSize: '1.5rem' }}>Products</h1>
+        <div className="admin-page-container">
+            <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', gap: '16px', flexWrap: 'wrap' }}>
+                <h1 style={{ fontSize: '1.5rem', margin: 0 }}>Products</h1>
                 <button className="btn btn-primary" onClick={() => { setEditing(null); setSelectedImages([]); setShowForm(true); }}>
-                    <Plus size={16} /> Add Product
+                    <Plus size={16} /> <span className="btn-text">Add Product</span>
                 </button>
             </div>
 
             {/* Search */}
-            <div style={{ position: 'relative', marginBottom: '20px', maxWidth: '320px' }}>
+            <div className="search-container" style={{ position: 'relative', marginBottom: '24px', maxWidth: '400px', width: '100%' }}>
                 <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--gray-400)' }} />
                 <input className="form-input" style={{ paddingLeft: '40px' }} placeholder="Search products..." value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
@@ -164,51 +177,158 @@ export default function AdminProductsPage() {
                                 </div>
                             </div>
 
-                            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                                <button type="button" className="btn btn-ghost" onClick={() => setShowForm(false)}>Cancel</button>
-                                <button type="submit" className="btn btn-primary">Save Product</button>
+                             <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                                <button type="button" className="btn btn-ghost" onClick={() => setShowForm(false)} disabled={isSaving}>Cancel</button>
+                                <button type="submit" className="btn btn-primary" disabled={isSaving}>
+                                    {isSaving ? (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <div className="spinner-small" />
+                                            <span>Saving...</span>
+                                        </div>
+                                    ) : 'Save Product'}
+                                </button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
 
-            {/* Table */}
-            {loading ? (
-                <div className="skeleton" style={{ height: '300px', borderRadius: 'var(--radius-lg)' }} />
-            ) : (
-                <div className="table-container">
-                    <table className="table">
-                        <thead>
-                            <tr><th>Name</th><th>Category</th><th>Status</th><th>Actions</th></tr>
-                        </thead>
-                        <tbody>
-                            {filtered.length === 0 ? (
-                                <tr><td colSpan={4} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '40px' }}>No products found</td></tr>
-                            ) : filtered.map(p => (
-                                <tr key={p.id}>
-                                    <td>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                            <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', overflow: 'hidden', background: 'var(--gray-100)', flexShrink: 0 }}>
-                                                {p.images?.[0] ? <img src={p.images[0].cloudinaryUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <ImageIcon size={20} style={{ margin: 10, color: 'var(--gray-300)' }} />}
-                                            </div>
-                                            <span style={{ fontWeight: 500 }}>{p.name}</span>
-                                        </div>
-                                    </td>
-                                    <td><span className="badge badge-primary">{p.category}</span></td>
-                                    <td><span className={`badge badge-${p.status === 'published' ? 'success' : p.status === 'draft' ? 'warning' : 'info'}`}>{p.status}</span></td>
-                                    <td>
-                                        <div style={{ display: 'flex', gap: '8px' }}>
-                                            <button className="btn btn-ghost btn-sm" onClick={() => { setEditing(p); setShowForm(true); }}><Edit2 size={14} /></button>
-                                            <button className="btn btn-ghost btn-sm" style={{ color: 'var(--error)' }} onClick={() => handleDelete(p.id)}><Trash2 size={14} /></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+            {/* Product Detail Modal (for Mobile/Quick View) */}
+            {selectedProduct && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setSelectedProduct(null)}>
+                    <div className="card" style={{ width: '100%', maxWidth: '500px', maxHeight: '90vh', overflow: 'auto', padding: '24px' }} onClick={e => e.stopPropagation()}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                            <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Product Details</h2>
+                            <button className="btn btn-ghost btn-icon" onClick={() => setSelectedProduct(null)}><X size={20} /></button>
+                        </div>
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            <div style={{ width: '100%', aspectRatio: '16/10', borderRadius: 'var(--radius-lg)', overflow: 'hidden', background: 'var(--gray-100)' }}>
+                                {selectedProduct.images?.[0] ? 
+                                    <img src={selectedProduct.images[0].cloudinaryUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 
+                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gray-300)' }}><ImageIcon size={48} /></div>
+                                }
+                            </div>
+                            
+                            <div>
+                                <label style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Name</label>
+                                <div style={{ fontSize: '1.125rem', fontWeight: 600 }}>{selectedProduct.name}</div>
+                            </div>
+                            
+                            <div style={{ display: 'flex', gap: '24px' }}>
+                                <div>
+                                    <label style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Category</label>
+                                    <div><span className="badge badge-primary">{selectedProduct.category}</span></div>
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</label>
+                                    <div><span className={`badge badge-${selectedProduct.status === 'published' ? 'success' : 'warning'}`}>{selectedProduct.status}</span></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label style={{ fontSize: '0.75rem', color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Description</label>
+                                <p style={{ fontSize: '0.9375rem', color: 'var(--gray-600)', lineHeight: 1.6, marginTop: '4px' }}>{selectedProduct.description}</p>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+                                <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => { setEditing(selectedProduct); setSelectedProduct(null); setShowForm(true); }}>
+                                    <Edit2 size={16} /> Edit
+                                </button>
+                                <button className="btn btn-outline" style={{ flex: 1, borderColor: 'var(--error)', color: 'var(--error)' }} onClick={() => { setDeletingId(selectedProduct.id); setSelectedProduct(null); }}>
+                                    <Trash2 size={16} /> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
+
+            {/* Table/Cards */}
+            {loading ? (
+                <div className="skeleton" style={{ height: '400px', borderRadius: 'var(--radius-lg)' }} />
+            ) : (
+                <>
+                    {/* Desktop View */}
+                    <div className="table-view" style={{ display: 'block' }}>
+                        <div className="table-container">
+                            <table className="table">
+                                <thead>
+                                    <tr><th>Name</th><th className="hide-mobile">Category</th><th className="hide-mobile">Status</th><th>Actions</th></tr>
+                                </thead>
+                                <tbody>
+                                    {filtered.length === 0 ? (
+                                        <tr><td colSpan={4} style={{ textAlign: 'center', color: 'var(--gray-400)', padding: '40px' }}>No products found</td></tr>
+                                    ) : filtered.map(p => (
+                                        <tr key={p.id} className="table-row">
+                                            <td onClick={() => { if (window.innerWidth <= 768) setSelectedProduct(p) }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                    <div style={{ width: 44, height: 44, borderRadius: 'var(--radius-md)', overflow: 'hidden', background: 'var(--gray-100)', flexShrink: 0 }}>
+                                                        {p.images?.[0] ? <img src={p.images[0].cloudinaryUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <ImageIcon size={20} style={{ margin: 12, color: 'var(--gray-300)' }} />}
+                                                    </div>
+                                                    <div>
+                                                        <div style={{ fontWeight: 600, color: 'var(--gray-900)' }}>{p.name}</div>
+                                                        <div className="show-mobile" style={{ fontSize: '0.75rem', color: 'var(--gray-400)', display: 'none' }}>{p.category}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="hide-mobile"><span className="badge badge-primary">{p.category}</span></td>
+                                            <td className="hide-mobile"><span className={`badge badge-${p.status === 'published' ? 'success' : p.status === 'draft' ? 'warning' : 'info'}`}>{p.status}</span></td>
+                                            <td>
+                                                <div style={{ display: 'flex', gap: '4px' }}>
+                                                    <button className="btn btn-ghost btn-sm btn-icon" onClick={(e) => { e.stopPropagation(); setEditing(p); setShowForm(true); }}><Edit2 size={14} /></button>
+                                                    <button className="btn btn-ghost btn-sm btn-icon" style={{ color: 'var(--error)' }} onClick={(e) => { e.stopPropagation(); setDeletingId(p.id); }}><Trash2 size={14} /></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </>
+            )}
+
+            <ConfirmModal 
+                isOpen={!!deletingId}
+                title="Delete Product"
+                message="Are you sure you want to delete this product? This action cannot be undone."
+                onConfirm={handleDelete}
+                onClose={() => setDeletingId(null)}
+                confirmText="Delete"
+                isLoading={isDeleting}
+            />
+
+            <style jsx>{`
+                @media (max-width: 640px) {
+                    .hide-mobile {
+                        display: none !important;
+                    }
+                    .show-mobile {
+                        display: block !important;
+                    }
+                    .btn-text {
+                        display: none;
+                    }
+                    .btn {
+                        padding: 10px !important;
+                    }
+                    .page-header h1 {
+                        font-size: 1.25rem !important;
+                    }
+                }
+                
+                .table-row {
+                    transition: background 0.2s ease;
+                    cursor: pointer;
+                }
+                
+                @media (max-width: 768px) {
+                    .table-row:hover {
+                        background: var(--gray-50);
+                    }
+                }
+            `}</style>
 
             {showMediaPicker && (
                 <MediaPicker

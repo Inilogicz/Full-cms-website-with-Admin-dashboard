@@ -191,7 +191,7 @@ export default function GalleryContent({ items }: GalleryContentProps) {
                                                             }}>{item.category}</span>
                                                         )}
                                                         <p style={{ color: 'white', fontWeight: 600, fontSize: '0.9375rem', marginBottom: '0', lineHeight: 1.4 }}>
-                                                            {item.caption || 'Niger Sanitary Excellence'}
+                                                            {item.caption || 'Niger Sanitary Industry Limited Excellence'}
                                                         </p>
                                                     </div>
                                                 </div>

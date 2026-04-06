@@ -76,7 +76,7 @@ export default function DistributorPage() {
                         <span className="section-label" style={{ color: 'var(--gold-dark)', fontWeight: 800 }}>Partnership</span>
                         <h1 style={{ color: 'var(--primary-dark)', marginBottom: '24px', fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 900 }}>
                             Scale Your Business <br />
-                            <span className="text-gradient-gold">With Niger Sanitary</span>
+                            <span className="text-gradient-gold">With Niger Sanitary Industry Limited</span>
                         </h1>
                         <p style={{ color: 'var(--gray-600)', fontSize: '1.25rem', maxWidth: '600px', lineHeight: 1.7 }}>
                             Join our growing network of distributors across Africa and partner with a brand trusted by millions for quality.
