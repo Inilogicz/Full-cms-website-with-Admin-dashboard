@@ -7,13 +7,28 @@ import { useEffect, useState } from 'react';
 
 export default function Footer() {
     const [settings, setSettings] = useState<any>(null);
+    const [products, setProducts] = useState<{ name: string; slug: string }[]>([]);
 
     useEffect(() => {
+        // Fetch settings
         fetch('/api/settings')
             .then(res => res.json())
             .then(data => {
                 if (data && !data.error) setSettings(data);
             });
+
+        // Fetch products
+        fetch('/api/products')
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setProducts(data.map((p: any) => ({
+                        name: p.name,
+                        slug: p.slug
+                    })));
+                }
+            })
+            .catch(err => console.error('Error fetching footer products:', err));
     }, []);
 
     const socialIcons = [
@@ -108,20 +123,14 @@ export default function Footer() {
                     {/* Products */}
                     <div>
                         <h4 style={{ color: 'var(--white)', fontSize: '1rem', marginBottom: '20px' }}>Our Products</h4>
-                        {[
-                            'LadySept Sanitary Towels',
-                            'Damson Serviette',
-                            'Absorbent Cotton Wool',
-                            'Damson Underpad',
-                            'Work Floor Underpad',
-                        ].map((item) => (
-                            <Link key={item} href="/products" style={{
+                        {products.map((product) => (
+                            <Link key={product.slug} href={`/products/${product.slug}`} style={{
                                 display: 'block',
                                 fontSize: '0.875rem',
                                 padding: '6px 0',
                                 transition: 'color var(--transition-fast)',
                             }}>
-                                {item}
+                                {product.name}
                             </Link>
                         ))}
                     </div>

@@ -8,7 +8,8 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
         const { id } = await context.params;
         await prisma.galleryItem.delete({ where: { id } });
         return NextResponse.json({ success: true });
-    } catch {
+    } catch (error) {
+        console.error('Delete Gallery Error:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }

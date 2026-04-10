@@ -4,171 +4,67 @@ import Link from 'next/link';
 import { ArrowLeft, Phone, Mail, Package, FileText, Layers, Image as ImageIcon } from 'lucide-react';
 import { Metadata } from 'next';
 
-const defaultProductsData: Record<string, any> = {
-    'ladysept-classic': {
-        name: 'LadySept Classic',
-        description: 'Our flagship sanitary towel, trusted by millions of women across Nigeria. LadySept Classic provides a perfect balance of comfort, absorbency, and fit.',
-        category: 'Feminine Care',
-        specifications: { 'Material': 'Cotton-soft non-woven cover', 'Absorbency': 'High', 'Wings': 'Yes', 'Pack Size': '8/10 pads', 'Certification': 'NAFDAC & ISO 9001' },
-        applications: 'Daily period protection, suitable for regular flow.',
-        packaging: 'Available in standard packs and bulk cartons for retailers.',
-        color: '#FFF5F7',
-        imageUrl: '/product6.JPG'
-    },
-    'ladysept-ultra-comfort': {
-        name: 'LadySept Ultra Comfort',
-        description: 'Ultra-thin yet powerful. Designed for the modern active woman who needs invisible protection without compromising on safety.',
-        category: 'Feminine Care',
-        specifications: { 'Thickness': 'Ultra-thin', 'Core': 'Super-absorbent polymer (SAP)', 'Shape': 'Anatomical', 'Pack Size': '10 pads' },
-        applications: 'Active lifestyles, tight clothing, light to moderate flow.',
-        packaging: 'Individually wrapped for hygiene and portability.',
-        color: '#F8F9FF',
-        imageUrl: '/product1.JPG'
-    },
-    'ladysept-night-protection': {
-        name: 'LadySept Night Protection',
-        description: 'Extra long to keep you secure all night long. Features reinforced guards and a wider back for 360-degree protection.',
-        category: 'Feminine Care',
-        specifications: { 'Length': 'Extra Long (320mm+)', 'Absorbency': 'Maximum', 'Wings': 'Dual-layer wings', 'Pack Size': '8 pads' },
-        applications: 'Overnight use, heavy flow days, post-partum.',
-        packaging: 'Standard packs.',
-        color: '#F5F3FF',
-        imageUrl: '/product2.JPG'
-    },
-    'ladysept-slim-fit': {
-        name: 'LadySept Slim Fit',
-        description: 'A more contoured design that fits perfectly with your movements. Ideal for those who prefer a more personalized fit.',
-        category: 'Feminine Care',
-        specifications: { 'Design': 'Snug Fit', 'Material': 'Breathable top-sheet', 'Absorbency': 'Moderate', 'Pack Size': '10 pads' },
-        applications: 'General use, school, workplace comfort.',
-        packaging: 'Standard packs.',
-        color: '#FDF2F8',
-        imageUrl: '/product3.JPG'
-    },
-    'ladysept-economy-pack': {
-        name: 'LadySept Economy Pack',
-        description: 'The same trusted protection in a value-oriented package. Designed to provide quality hygiene at an accessible price point.',
-        category: 'Feminine Care',
-        specifications: { 'Value': 'Economy pack', 'Absorbency': 'Reliable', 'Wings': 'Yes', 'Quantity': 'Multi-pack options' },
-        applications: 'Large households, budget-conscious consumers.',
-        packaging: 'Budget-friendly bulk packs.',
-        color: '#F0FDFA',
-        imageUrl: '/product4.JPG'
-    },
-    'ladysept-soft-touch': {
-        name: 'LadySept Soft Touch',
-        description: 'Infused with a cotton-like softness that is gentle on sensitive skin. Prevents rashes and ensures maximum breathability.',
-        category: 'Feminine Care',
-        specifications: { 'Material': 'Cotton-soft non-irritating cover', 'Absorbency': 'Moderate to High', 'Breathability': 'High', 'Dermatology': 'Gentle' },
-        applications: 'Sensitive skin, daily moderate flow.',
-        packaging: 'Standard packs.',
-        color: '#FFFBEB',
-        imageUrl: '/product5.JPG'
-    },
-    'ladysept-super-absorbent': {
-        name: 'LadySept Super Absorbent',
-        description: 'Engineered for the heaviest days. Our SAP-heavy core locks in moisture instantly to keep you dry and comfortable.',
-        category: 'Feminine Care',
-        specifications: { 'Technology': 'Dual SAP Core', 'Absorbency': 'Ultra High', 'Wings': 'Reinforced', 'Pack Size': '8/10 pads' },
-        applications: 'Heavy flow, long durations between changes.',
-        packaging: 'Standard packs.',
-        color: '#EFF6FF',
-        imageUrl: '/product7.JPG'
-    },
-    'damson-premium-serviettes': {
-        name: 'Damson Premium Serviettes',
-        description: 'Add a touch of class to your dining. Our premium serviettes are thick, soft, and highly absorbent.',
-        category: 'Home & Hygiene',
-        specifications: { 'Material': 'Virgin pulp tissue', 'Layers': '2-Ply / 3-Ply options', 'Texture': 'Embossed', 'Pack Size': '50/100 sheets' },
-        applications: 'Formal events, hotel service, luxury dining.',
-        packaging: 'Transparent plastic wrap.',
-        color: '#F9FAFB',
-        imageUrl: '/product8.JPG'
-    },
-    'damson-restaurant-napkins': {
-        name: 'Damson Restaurant Napkins',
-        description: 'Designed for durability and value. These napkins are the choice for over 1000 food establishments in Nigeria.',
-        category: 'Home & Hygiene',
-        specifications: { 'Material': 'Absorbent tissue', 'Durability': 'High', 'Value': 'Best price-per-sheet', 'Pack Size': 'Bulk bundles' },
-        applications: 'Restaurants, cafeterias, fast food, family use.',
-        packaging: 'Bulk bundles.',
-        color: '#F0FDF4',
-        imageUrl: '/product9.JPG'
-    },
-    'absorbent-cotton-wool-50g': {
-        name: 'Absorbent Cotton Wool (50g)',
-        description: 'Medical-grade absorbent cotton wool for professional and home healthcare use. 100% pure and highly absorbent.',
-        category: 'Medical Supplies',
-        specifications: { 'Material': '100% Natural Cotton', 'Sterility': 'High standards', 'Weight': '50g', 'Certification': 'Medical Grade' },
-        applications: 'Wound cleaning, makeup removal, clinical swabs.',
-        packaging: 'Sealed moisture-proof wrap.',
-        color: '#F8FAFC',
-        imageUrl: '/product10.JPG'
-    },
-    'absorbent-cotton-wool-100g': {
-        name: 'Absorbent Cotton Wool (100g)',
-        description: 'Large size clinic-ready cotton wool. Ideal for hospitals and extensive home first-aid kits.',
-        category: 'Medical Supplies',
-        specifications: { 'Material': '100% Natural Cotton', 'Sterility': 'High standards', 'Weight': '100g', 'Certification': 'Medical Grade' },
-        applications: 'Hospitals, surgical preparation, bulk medical use.',
-        packaging: 'Sealed moisture-proof wrap.',
-        color: '#F8FAFC',
-        imageUrl: '/product11.JPG'
-    },
-};
-
 type PageProps = {
     params: Promise<{ slug: string }>;
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { slug } = await params;
-    const product = defaultProductsData[slug];
-    return { title: product?.name || 'Product', description: product?.description?.substring(0, 160) };
+    
+    const dbProduct = await prisma.product.findUnique({
+        where: { slug }
+    });
+
+    if (dbProduct) {
+        return { 
+            title: `${dbProduct.name} | Niger Sanitary`, 
+            description: dbProduct.description?.substring(0, 160) 
+        };
+    }
+
+    return { title: 'Product Not Found', description: 'The requested product could not be found.' };
 }
 
 export default async function ProductDetailPage({ params }: PageProps) {
     const { slug } = await params;
 
-    // Fuzzy/Direct mapping for slugs
-    let productKey = slug;
-    if (slug === 'ladysept-sanitary-towels' && !defaultProductsData[slug]) {
-        productKey = 'ladysept-classic'; // Fallback to classic
-    }
+    const dbProduct = await prisma.product.findUnique({
+        where: { slug: slug },
+        include: { images: true }
+    });
 
-    let product: any = defaultProductsData[productKey];
-    let images: any[] = [];
+    if (!dbProduct) notFound();
 
-    try {
-        const dbProduct = await prisma.product.findUnique({
-            where: { slug: productKey },
-            include: { images: true }
-        });
-        if (dbProduct) {
-            product = {
-                name: dbProduct.name,
-                description: dbProduct.description,
-                category: dbProduct.category,
-                specifications: (dbProduct.specifications as Record<string, string>) || {},
-                applications: dbProduct.applications || '',
-                packaging: dbProduct.packaging || '',
-                color: '#F9FAFB',
-                imageUrl: dbProduct.images[0]?.cloudinaryUrl
-            };
-            images = dbProduct.images;
-        }
-    } catch { /* use default */ }
+    const product = {
+        name: dbProduct.name,
+        description: dbProduct.description,
+        category: dbProduct.category,
+        specifications: (dbProduct.specifications as Record<string, string>) || {},
+        applications: dbProduct.applications || '',
+        packaging: dbProduct.packaging || '',
+        color: '#F9FAFB',
+    };
+    const images = dbProduct.images;
 
-    if (!product) notFound();
-
-    const mainImageUrl = images.length > 0 ? images[0].cloudinaryUrl : (product.imageUrl || '/image.png');
+    const mainImageUrl = images.length > 0 ? images[0].cloudinaryUrl : '/image.png';
     const specs = product.specifications || {};
 
-    // Filter suggested products
-    const suggestedProducts = Object.entries(defaultProductsData)
-        .filter(([key]) => key !== productKey)
-        .slice(0, 3)
-        .map(([key, data]) => ({ slug: key, ...data }));
+    // Dynamic suggested products
+    const related = await prisma.product.findMany({
+        where: {
+            slug: { not: slug },
+            status: 'published'
+        },
+        take: 3,
+        include: { images: true }
+    });
+    
+    const suggestedProducts = related.map(p => ({
+        name: p.name,
+        slug: p.slug,
+        description: p.description,
+        imageUrl: p.images[0]?.cloudinaryUrl || '/image.png'
+    }));
 
     return (
         <div className="product-detail-wrapper" style={{ background: '#FDFDFF' }}>

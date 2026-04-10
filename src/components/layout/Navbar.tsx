@@ -12,13 +12,7 @@ const navLinks = [
     {
         name: 'Products',
         href: '/products',
-        children: [
-            { name: 'LadySept Sanitary Towels', href: '/products/ladysept-sanitary-towels' },
-            { name: 'Damson Serviette', href: '/products/damson-serviette' },
-            { name: 'Absorbent Cotton Wool', href: '/products/absorbent-cotton-wool' },
-            { name: 'Damson Underpad', href: '/products/damson-underpad' },
-            { name: 'Work Floor Underpad', href: '/products/work-floor-underpad' },
-        ]
+        isProducts: true
     },
     { name: 'Where to Buy', href: '/where-to-buy' },
     { name: 'Gallery', href: '/gallery' },
@@ -31,10 +25,25 @@ export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+    const [products, setProducts] = useState<{ name: string; slug: string }[]>([]);
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
         window.addEventListener('scroll', handleScroll);
+
+        // Fetch products for navigation
+        fetch('/api/products')
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setProducts(data.map(p => ({
+                        name: p.name,
+                        slug: p.slug
+                    })));
+                }
+            })
+            .catch(err => console.error('Error fetching dynamic products:', err));
+
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
@@ -117,11 +126,11 @@ export default function Navbar() {
                 }}
                     className="desktop-nav"
                 >
-                    {navLinks.map((link) => (
+                    {navLinks.map((link: any) => (
                         <div
                             key={link.name}
                             style={{ position: 'relative' }}
-                            onMouseEnter={() => link.children && setActiveDropdown(link.name)}
+                            onMouseEnter={() => (link.isProducts || link.children) && setActiveDropdown(link.name)}
                             onMouseLeave={() => setActiveDropdown(null)}
                         >
                             <Link
@@ -140,11 +149,11 @@ export default function Navbar() {
                                 }}
                             >
                                 {link.name}
-                                {link.children && <ChevronDown size={14} />}
+                                {(link.isProducts || link.children) && <ChevronDown size={14} />}
                             </Link>
 
                             {/* Dropdown */}
-                            {link.children && activeDropdown === link.name && (
+                            {((link.isProducts && products.length > 0) || link.children) && activeDropdown === link.name && (
                                 <motion.div
                                     initial={{ opacity: 0, y: 8 }}
                                     animate={{ opacity: 1, y: 0 }}
@@ -161,22 +170,43 @@ export default function Navbar() {
                                         border: '1px solid var(--gray-100)',
                                     }}
                                 >
-                                    {link.children.map((child) => (
-                                        <Link
-                                            key={child.name}
-                                            href={child.href}
-                                            style={{
-                                                display: 'block',
-                                                padding: '10px 16px',
-                                                fontSize: '0.875rem',
-                                                color: 'var(--gray-700)',
-                                                borderRadius: 'var(--radius-md)',
-                                                transition: 'all var(--transition-fast)',
-                                            }}
-                                        >
-                                            {child.name}
-                                        </Link>
-                                    ))}
+                                    {link.isProducts ? (
+                                        products.map((product) => (
+                                            <Link
+                                                key={product.slug}
+                                                href={`/products/${product.slug}`}
+                                                style={{
+                                                    display: 'block',
+                                                    padding: '10px 16px',
+                                                    fontSize: '0.875rem',
+                                                    color: 'var(--gray-700)',
+                                                    borderRadius: 'var(--radius-md)',
+                                                    transition: 'all var(--transition-fast)',
+                                                }}
+                                                onClick={() => setActiveDropdown(null)}
+                                            >
+                                                {product.name}
+                                            </Link>
+                                        ))
+                                    ) : (
+                                        link.children?.map((child: any) => (
+                                            <Link
+                                                key={child.name}
+                                                href={child.href}
+                                                style={{
+                                                    display: 'block',
+                                                    padding: '10px 16px',
+                                                    fontSize: '0.875rem',
+                                                    color: 'var(--gray-700)',
+                                                    borderRadius: 'var(--radius-md)',
+                                                    transition: 'all var(--transition-fast)',
+                                                }}
+                                                onClick={() => setActiveDropdown(null)}
+                                            >
+                                                {child.name}
+                                            </Link>
+                                        ))
+                                    )}
                                 </motion.div>
                             )}
                         </div>
@@ -230,7 +260,7 @@ export default function Navbar() {
                         className="mobile-menu"
                     >
                         <div style={{ padding: '16px 24px' }}>
-                            {navLinks.map((link) => (
+                            {navLinks.map((link: any) => (
                                 <div key={link.name}>
                                     <Link
                                         href={link.href}
@@ -246,9 +276,27 @@ export default function Navbar() {
                                     >
                                         {link.name}
                                     </Link>
-                                    {link.children && (
+                                    {link.isProducts ? (
                                         <div style={{ paddingLeft: '16px' }}>
-                                            {link.children.map((child) => (
+                                            {products.map((product) => (
+                                                <Link
+                                                    key={product.slug}
+                                                    href={`/products/${product.slug}`}
+                                                    onClick={() => setIsOpen(false)}
+                                                    style={{
+                                                        display: 'block',
+                                                        padding: '8px 0',
+                                                        fontSize: '0.875rem',
+                                                        color: 'var(--gray-500)',
+                                                    }}
+                                                >
+                                                    {product.name}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    ) : link.children && (
+                                        <div style={{ paddingLeft: '16px' }}>
+                                            {link.children.map((child: any) => (
                                                 <Link
                                                     key={child.name}
                                                     href={child.href}

@@ -47,6 +47,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
         await prisma.product.delete({ where: { id } });
         return NextResponse.json({ success: true });
     } catch (error) {
+        console.error('Delete Product Error:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }

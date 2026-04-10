@@ -16,6 +16,7 @@ interface Product {
     images?: Media[];
     applications?: string;
     packaging?: string;
+    specifications?: Record<string, any>;
 }
 
 export default function AdminProductsPage() {
@@ -30,6 +31,7 @@ export default function AdminProductsPage() {
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [formSpecs, setFormSpecs] = useState<{ key: string; value: string }[]>([]);
 
     useEffect(() => { fetchProducts(); }, []);
 
@@ -45,8 +47,11 @@ export default function AdminProductsPage() {
     useEffect(() => {
         if (editing) {
             setSelectedImages(editing.images || []);
+            const specs = editing.specifications || {};
+            setFormSpecs(Object.entries(specs).map(([key, value]) => ({ key, value: String(value) })));
         } else {
             setSelectedImages([]);
+            setFormSpecs([]);
         }
     }, [editing, showForm]);
 
@@ -62,6 +67,10 @@ export default function AdminProductsPage() {
             packaging: formData.get('packaging'),
             status: formData.get('status'),
             imageIds: selectedImages.map(img => img.id),
+            specifications: formSpecs.reduce((acc, curr) => {
+                if (curr.key.trim()) acc[curr.key.trim()] = curr.value;
+                return acc;
+            }, {} as Record<string, string>),
         };
 
         const url = editing ? `/api/products/${editing.id}` : '/api/products';
@@ -149,6 +158,52 @@ export default function AdminProductsPage() {
                                     <option value="published">Published</option>
                                     <option value="archived">Archived</option>
                                 </select>
+                            </div>
+
+                            <div className="form-group">
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                    <label className="form-label" style={{ marginBottom: 0 }}>Specifications</label>
+                                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => setFormSpecs([...formSpecs, { key: '', value: '' }])}>
+                                        <Plus size={14} /> Add Spec
+                                    </button>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    {formSpecs.map((spec, index) => (
+                                        <div key={index} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                            <input
+                                                placeholder="Label (e.g. Size)"
+                                                className="form-input"
+                                                style={{ flex: 1 }}
+                                                value={spec.key}
+                                                onChange={(e) => {
+                                                    const newSpecs = [...formSpecs];
+                                                    newSpecs[index].key = e.target.value;
+                                                    setFormSpecs(newSpecs);
+                                                }}
+                                            />
+                                            <input
+                                                placeholder="Value (e.g. 60x90cm)"
+                                                className="form-input"
+                                                style={{ flex: 1 }}
+                                                value={spec.value}
+                                                onChange={(e) => {
+                                                    const newSpecs = [...formSpecs];
+                                                    newSpecs[index].value = e.target.value;
+                                                    setFormSpecs(newSpecs);
+                                                }}
+                                            />
+                                            <button
+                                                type="button"
+                                                className="btn btn-ghost btn-icon btn-sm"
+                                                style={{ color: 'var(--error)' }}
+                                                onClick={() => setFormSpecs(formSpecs.filter((_, i) => i !== index))}
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {formSpecs.length === 0 && <div style={{ textAlign: 'center', padding: '12px', background: 'var(--gray-50)', borderRadius: 'var(--radius-md)', fontSize: '0.875rem', color: 'var(--gray-400)' }}>No specifications added</div>}
+                                </div>
                             </div>
 
                             <div className="form-group">
