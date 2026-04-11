@@ -265,13 +265,41 @@ export default function HomeClient({ settings, products }: HomeClientProps) {
           <div style={{ textAlign: 'center', marginBottom: '60px' }}>
             <h2 style={{ fontSize: '2.5rem', fontWeight: 900 }}>High-Performance Products</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '32px' }}>
             {products.map((product) => (
-              <div key={product.slug} style={{ background: 'white', padding: '24px', borderRadius: '24px', border: '1px solid var(--gray-100)' }}>
-                <img src={product.images?.[0]?.cloudinaryUrl || '/product1.JPG'} alt={product.name} style={{ width: '100%', height: '180px', objectFit: 'contain' }} />
-                <h3 style={{ fontSize: '1.125rem', fontWeight: 800, marginTop: '20px' }}>{product.name}</h3>
-                <p style={{ fontSize: '0.875rem', color: 'var(--gray-500)', marginTop: '8px' }}>{product.description}</p>
-              </div>
+              <Link key={product.slug} href={`/products/${product.slug}`}>
+                <motion.div 
+                  whileHover={{ y: -10, boxShadow: '0 20px 40px -10px rgba(0,0,0,0.1)' }}
+                  style={{ 
+                    background: 'white', 
+                    padding: '32px', 
+                    borderRadius: '24px', 
+                    border: '1px solid var(--gray-100)',
+                    height: '100%',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <img 
+                    src={product.images?.[0]?.cloudinaryUrl || '/product1.JPG'} 
+                    alt={product.name} 
+                    style={{ width: '100%', height: '220px', objectFit: 'contain' }} 
+                  />
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 900, marginTop: '24px', color: 'var(--primary-dark)' }}>{product.name}</h3>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--gray-500)', marginTop: '12px', lineHeight: 1.6 }}>{product.description}</p>
+                  <div style={{ 
+                    marginTop: '24px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '4px', 
+                    color: 'var(--primary)', 
+                    fontWeight: 700, 
+                    fontSize: '0.8125rem' 
+                  }}>
+                    View Details <ArrowRight size={14} />
+                  </div>
+                </motion.div>
+              </Link>
             ))}
           </div>
         </div>

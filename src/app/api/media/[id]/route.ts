@@ -10,8 +10,14 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
         const media = await prisma.media.findUnique({ where: { id } });
         if (!media) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-        // Delete from Cloudinary
-        await deleteImage(media.publicId);
+        // Delete from Cloudinary (don't fail the whole request if this fails)
+        if (media.publicId) {
+            try {
+                await deleteImage(media.publicId);
+            } catch (err) {
+                console.error('Cloudinary delete failed:', err);
+            }
+        }
 
         // Delete from DB
         await prisma.media.delete({ where: { id } });

@@ -153,9 +153,36 @@ export default function AdminSettingsPage() {
         if (pickingFor === 'hero') setSettings({...settings, heroImage: url});
         if (pickingFor === 'about') setSettings({...settings, aboutImage: url});
         if (pickingFor === 'heritage') {
-            const current = settings.aboutHeritageImages || [];
-            if (!current.includes(url)) {
-                setSettings({...settings, aboutHeritageImages: [...current, url]});
+            if ((window as any)._pickingForFeature) {
+                setSettings({...settings, aboutFeatureImage: url});
+                (window as any)._pickingForFeature = false;
+            } else if ((window as any)._pickingForFloating !== undefined) {
+                const index = (window as any)._pickingForFloating;
+                const current = [...(settings.aboutFloatingImages || [])];
+                
+                // Ensure we have 4 images and keep positions
+                const defaultFloats = [
+                    { top: '10%', left: '2%', size: '140px', mobileSize: '60px', delay: 0 },
+                    { top: '65%', left: '5%', size: '160px', mobileSize: '80px', delay: 0.4 },
+                    { top: '12%', left: '85%', size: '130px', mobileSize: '70px', delay: 0.8 },
+                    { top: '70%', left: '88%', size: '150px', mobileSize: '75px', delay: 1.2 },
+                ];
+
+                // Update or initialize
+                if (current.length < 4) {
+                    for (let i = 0; i < 4; i++) {
+                        if (!current[i]) current[i] = { ...defaultFloats[i], url: '' };
+                    }
+                }
+                
+                current[index].url = url;
+                setSettings({...settings, aboutFloatingImages: current});
+                delete (window as any)._pickingForFloating;
+            } else {
+                const current = settings.aboutHeritageImages || [];
+                if (!current.includes(url)) {
+                    setSettings({...settings, aboutHeritageImages: [...current, url]});
+                }
             }
         }
         setIsMediaPickerOpen(false);
@@ -439,8 +466,59 @@ export default function AdminSettingsPage() {
 
                         {/* Product Highlights & Quote */}
                         <div>
-                            <h3 style={{ fontSize: '1.125rem', fontWeight: 800, marginBottom: '24px', paddingBottom: '12px', borderBottom: '1px solid var(--gray-100)' }}>Product Highlight & Quote</h3>
-                            <div className="form-group">
+                            <h3 style={{ fontSize: '1.125rem', fontWeight: 800, marginBottom: '24px', paddingBottom: '12px', borderBottom: '1px solid var(--gray-100)' }}>Highlight & Background</h3>
+                            
+                            <div className="grid-2">
+                                <div className="form-group">
+                                    <label className="form-label">LadySept Feature Image</label>
+                                    <div 
+                                        style={{ 
+                                            height: '160px', 
+                                            borderRadius: '16px', 
+                                            border: '2px dashed var(--gray-200)', 
+                                            background: settings.aboutFeatureImage ? `url(${settings.aboutFeatureImage}) center/cover no-repeat` : 'var(--gray-50)',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}
+                                        onClick={() => { setPickingFor('heritage' as any); (window as any)._pickingForFeature = true; setIsMediaPickerOpen(true); }}
+                                    >
+                                        {!settings.aboutFeatureImage && <ImageIcon size={32} color="var(--gray-300)" />}
+                                    </div>
+                                    <p style={{ fontSize: '0.75rem', color: 'var(--gray-500)', marginTop: '8px' }}>Large image shown in the LadySept comfort section.</p>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Floating Background Images (Max 4)</label>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+                                        {Array.from({ length: 4 }).map((_, i) => {
+                                            const url = settings.aboutFloatingImages?.[i]?.url;
+                                            return (
+                                                <div 
+                                                    key={i}
+                                                    onClick={() => { setPickingFor('heritage' as any); (window as any)._pickingForFloating = i; setIsMediaPickerOpen(true); }}
+                                                    style={{ 
+                                                        aspectRatio: '1', 
+                                                        borderRadius: '12px', 
+                                                        border: '2px dashed var(--gray-200)', 
+                                                        background: url ? `url(${url}) center/cover no-repeat` : 'var(--gray-50)',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        overflow: 'hidden'
+                                                    }}
+                                                >
+                                                    {!url && <Plus size={16} color="var(--gray-300)" />}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="form-group" style={{ marginTop: '24px' }}>
                                 <label className="form-label">Endorsement Quote</label>
                                 <textarea className="form-input" rows={2} value={settings.aboutQuote} onChange={e => setSettings({...settings, aboutQuote: e.target.value})} />
                             </div>

@@ -166,6 +166,8 @@ model HomeConfig {
   aboutQuote       String   @default("Often being recommended as part of the Hospital child delivery list.")
   aboutHeritageStats Json?    // Array of { label, value, icon }
   aboutHeritageImages Json?   // Array of strings (image URLs)
+  aboutFloatingImages Json?   // Array of { url, top, left, size, mobileSize, delay }
+  aboutFeatureImage   String?  // LadySept highlighted product image
   aboutStatBadgeValue String @default("25+")
   aboutStatBadgeLabel String @default("Years of Excellence")
   aboutLadySeptFeatures Json? // Array of strings

@@ -47,6 +47,20 @@ export default function AboutClient({ settings }: AboutClientProps) {
         ? settings.aboutLadySeptFeatures 
         : defaultFeatures;
 
+    const floatingImages = settings?.aboutFloatingImages?.length > 0
+        ? settings.aboutFloatingImages.map((img: any) => ({
+            ...img,
+            url: img.url || '/product1.JPG' // Fallback for specific slot if url is empty
+        }))
+        : [
+            { url: '/product1.JPG', top: '10%', left: '2%', size: '140px', mobileSize: '60px', delay: 0 },
+            { url: '/product6.JPG', top: '65%', left: '5%', size: '160px', mobileSize: '80px', delay: 0.4 },
+            { url: '/product10.JPG', top: '12%', left: '85%', size: '130px', mobileSize: '70px', delay: 0.8 },
+            { url: '/product4.JPG', top: '70%', left: '88%', size: '150px', mobileSize: '75px', delay: 1.2 },
+        ];
+
+    const featureImage = settings?.aboutFeatureImage || "/product6.JPG";
+
     const heritageStats = settings?.aboutHeritageStats?.length > 0
         ? settings.aboutHeritageStats
         : [
@@ -70,12 +84,7 @@ export default function AboutClient({ settings }: AboutClientProps) {
                 <FloatingProductBackground
                     theme="dark"
                     intensity={80}
-                    images={[
-                        { url: '/product1.JPG', top: '10%', left: '2%', size: '140px', mobileSize: '60px', delay: 0 },
-                        { url: '/product6.JPG', top: '65%', left: '5%', size: '160px', mobileSize: '80px', delay: 0.4 },
-                        { url: '/product10.JPG', top: '12%', left: '85%', size: '130px', mobileSize: '70px', delay: 0.8 },
-                        { url: '/product4.JPG', top: '70%', left: '88%', size: '150px', mobileSize: '75px', delay: 1.2 },
-                    ]}
+                    images={floatingImages}
                 />
 
                 <div className="container" style={{ position: 'relative', zIndex: 1 }}>
@@ -298,7 +307,7 @@ export default function AboutClient({ settings }: AboutClientProps) {
                                     boxShadow: '0 50px 100px rgba(0,0,0,0.1)'
                                 }}>
                                     <img
-                                        src="/product6.JPG"
+                                        src={featureImage}
                                         alt="LadySept Most Common Product"
                                         style={{ width: '100%', height: 'auto', display: 'block' }}
                                     />

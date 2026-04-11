@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Phone, Mail, Package, FileText, Layers, Image as ImageIcon } from 'lucide-react';
 import { Metadata } from 'next';
+import ProductGallery from '@/components/products/ProductGallery';
 
 type PageProps = {
     params: Promise<{ slug: string }>;
@@ -45,8 +46,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
         color: '#F9FAFB',
     };
     const images = dbProduct.images;
-
-    const mainImageUrl = images.length > 0 ? images[0].cloudinaryUrl : '/image.png';
     const specs = product.specifications || {};
 
     // Dynamic suggested products
@@ -93,42 +92,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
                         position: 'relative'
                     }} className="responsive-grid-2 product-detail-grid">
 
-                        {/* Product Gallery - Fixed Sticky Implementation */}
-                        <div className="product-gallery-container">
-                            <div style={{
-                                aspectRatio: '1',
-                                overflow: 'hidden',
-                                border: '1px solid #E2E8F0',
-                                boxShadow: '0 20px 50px -12px rgba(0,0,0,0.05)',
-                                padding: '40px'
-                            }}>
-                                <img
-                                    src={mainImageUrl}
-                                    alt={product.name}
-                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                                />
-                            </div>
-
-                            {images.length > 1 && (
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '16px', marginTop: '24px' }}>
-                                    {images.map((img, i) => (
-                                        <div
-                                            key={img.id}
-                                            style={{
-                                                aspectRatio: '1',
-                                                borderRadius: '16px',
-                                                overflow: 'hidden',
-                                                border: i === 0 ? '2px solid var(--primary)' : '1px solid var(--gray-100)',
-                                                cursor: 'pointer',
-                                                padding: '8px',
-                                                background: 'white'
-                                            }}>
-                                            <img src={img.cloudinaryUrl} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                        {/* Product Gallery - Client Component */}
+                        <ProductGallery images={images} productName={product.name} />
 
                         {/* Product Info */}
                         <div style={{ paddingBottom: '80px' }}>

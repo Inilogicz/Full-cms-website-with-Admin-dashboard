@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Upload, Trash2, Image as ImageIcon, Search, Copy, Check } from 'lucide-react';
+import { useToast } from '@/context/ToastContext';
 import ConfirmModal from '@/components/ui/ConfirmModal';
 
 interface MediaItem {
@@ -10,6 +11,7 @@ interface MediaItem {
 }
 
 export default function AdminMediaPage() {
+    const { showToast } = useToast();
     const [media, setMedia] = useState<MediaItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
@@ -26,12 +28,11 @@ export default function AdminMediaPage() {
         fetch('/api/media')
             .then(res => res.json())
             .then(data => setMedia(data))
-            .catch(() => { /* */ })
+            .catch(() => showToast('Failed to fetch media', 'error'))
             .finally(() => setLoading(false));
     }
 
     function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
-        // ... (rest of handleUpload remains same as previous update)
         const files = e.target.files;
         if (!files?.length) return;
         
@@ -43,6 +44,7 @@ export default function AdminMediaPage() {
             if (index >= fileList.length) {
                 setUploading(false);
                 setUploadProgress({ current: 0, total: 0 });
+                showToast(`Successfully uploaded ${fileList.length} image(s)`, 'success');
                 fetchMedia();
                 e.target.value = '';
                 return;
@@ -56,7 +58,10 @@ export default function AdminMediaPage() {
 
             fetch('/api/upload', { method: 'POST', body: formData })
                 .then(() => uploadNext(index + 1))
-                .catch(() => uploadNext(index + 1));
+                .catch(() => {
+                    showToast(`Failed to upload ${fileList[index].name}`, 'error');
+                    uploadNext(index + 1);
+                });
         };
 
         uploadNext(0);
@@ -66,11 +71,13 @@ export default function AdminMediaPage() {
         if (!deletingId) return;
         setIsDeleting(true);
         fetch(`/api/media/${deletingId}`, { method: 'DELETE' })
-            .then(() => {
+            .then(res => {
+                if (!res.ok) throw new Error();
+                showToast('Image deleted successfully', 'success');
                 setDeletingId(null);
                 fetchMedia();
             })
-            .catch(() => { /* */ })
+            .catch(() => showToast('Failed to delete image', 'error'))
             .finally(() => setIsDeleting(false));
     }
 
