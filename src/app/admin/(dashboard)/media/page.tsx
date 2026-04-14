@@ -62,6 +62,7 @@ export default function AdminMediaPage() {
             const formData = new FormData();
             formData.append('file', fileList[index]);
             formData.append('altText', fileList[index].name);
+            formData.append('folder', 'media');
 
             fetch('/api/upload', { method: 'POST', body: formData })
                 .then(res => {

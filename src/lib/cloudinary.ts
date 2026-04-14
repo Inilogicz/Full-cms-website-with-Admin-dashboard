@@ -1,25 +1,27 @@
 import { v2 as cloudinary } from 'cloudinary';
 
-export async function uploadImage(file: string) {
+export async function uploadImage(file: string, folder: string = 'niger-sanitary') {
     try {
         // Configure inside the function to ensure environment variables are loaded
         cloudinary.config({
-            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-            api_key: process.env.CLOUDINARY_API_KEY,
-            api_secret: process.env.CLOUDINARY_API_SECRET,
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME?.trim(),
+            api_key: process.env.CLOUDINARY_API_KEY?.trim(),
+            api_secret: process.env.CLOUDINARY_API_SECRET?.trim(),
             secure: true
         });
 
-        const secret = process.env.CLOUDINARY_API_SECRET || '';
-        console.log('Cloudinary Config Attempt:', {
-            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-            api_key: process.env.CLOUDINARY_API_KEY,
-            api_secret_start: secret.substring(0, 4),
-            api_secret_end: secret.substring(secret.length - 4),
+        const secret = (process.env.CLOUDINARY_API_SECRET || '').trim();
+        console.log('Cloudinary Config:', {
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME?.trim(),
+            api_key: process.env.CLOUDINARY_API_KEY?.trim(),
+            secret_length: secret.length,
+            secret_start: secret.substring(0, 4),
+            secret_end: secret.substring(secret.length - 4),
         });
 
         const result = await cloudinary.uploader.upload(file, {
             resource_type: 'image',
+            folder,
         });
         return {
             url: result.secure_url,
