@@ -59,10 +59,13 @@ export default function AdminGalleryPage() {
             return;
         }
 
-        const MAX_SIZE_MB = 10;
+        const MAX_SIZE_MB = 4;
         if (file.size > MAX_SIZE_MB * 1024 * 1024) {
             setUploading(false);
-            showToast(`Image is too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum allowed size is ${MAX_SIZE_MB}MB. Please compress or resize the image first.`, 'error');
+            showToast(
+                `File too large: ${file.name} is ${(file.size / 1024 / 1024).toFixed(1)}MB. Maximum upload size is ${MAX_SIZE_MB}MB. Please compress or resize your image before uploading.`,
+                'error'
+            );
             return;
         }
 

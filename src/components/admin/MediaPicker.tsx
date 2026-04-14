@@ -50,10 +50,10 @@ export default function MediaPicker({ onSelect, onClose, currentId, allowMultipl
             return;
         }
 
-        const MAX_SIZE_MB = 10;
+        const MAX_SIZE_MB = 4;
         const oversized = Array.from(files).filter(f => f.size > MAX_SIZE_MB * 1024 * 1024);
         if (oversized.length > 0) {
-            alert(`${oversized.map(f => f.name).join(', ')} exceed the ${MAX_SIZE_MB}MB limit.`);
+            alert(`File too large: ${oversized.map(f => `${f.name} (${(f.size / 1024 / 1024).toFixed(1)}MB)`).join(', ')}. Maximum upload size is ${MAX_SIZE_MB}MB. Please compress or resize before uploading.`);
             e.target.value = '';
             return;
         }

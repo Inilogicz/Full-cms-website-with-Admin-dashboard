@@ -43,10 +43,13 @@ export default function AdminMediaPage() {
             return;
         }
 
-        const MAX_SIZE_MB = 10;
+        const MAX_SIZE_MB = 4;
         const oversized = Array.from(files).filter(f => f.size > MAX_SIZE_MB * 1024 * 1024);
         if (oversized.length > 0) {
-            showToast(`${oversized.map(f => f.name).join(', ')} exceed${oversized.length === 1 ? 's' : ''} the ${MAX_SIZE_MB}MB limit. Please compress or resize before uploading.`, 'error');
+            showToast(
+                `File too large: ${oversized.map(f => `${f.name} (${(f.size / 1024 / 1024).toFixed(1)}MB)`).join(', ')}. Maximum upload size is ${MAX_SIZE_MB}MB. Please compress or resize your image before uploading.`,
+                'error'
+            );
             e.target.value = '';
             return;
         }
