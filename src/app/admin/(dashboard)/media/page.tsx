@@ -43,6 +43,14 @@ export default function AdminMediaPage() {
             return;
         }
 
+        const MAX_SIZE_MB = 10;
+        const oversized = Array.from(files).filter(f => f.size > MAX_SIZE_MB * 1024 * 1024);
+        if (oversized.length > 0) {
+            showToast(`${oversized.map(f => f.name).join(', ')} exceed${oversized.length === 1 ? 's' : ''} the ${MAX_SIZE_MB}MB limit. Please compress or resize before uploading.`, 'error');
+            e.target.value = '';
+            return;
+        }
+
         setUploading(true);
         setUploadProgress({ current: 1, total: files.length });
 
