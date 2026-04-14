@@ -35,7 +35,14 @@ export default function AdminMediaPage() {
     function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
         const files = e.target.files;
         if (!files?.length) return;
-        
+
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+        const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+        if (!cloudName || !uploadPreset) {
+            showToast('Cloudinary is not configured', 'error');
+            return;
+        }
+
         setUploading(true);
         setUploadProgress({ current: 1, total: files.length });
 
@@ -48,7 +55,7 @@ export default function AdminMediaPage() {
                 setUploading(false);
                 setUploadProgress({ current: 0, total: 0 });
                 if (succeeded > 0) {
-                    showToast(`Successfully uploaded ${succeeded} image(s)${failed > 0 ? `, ${failed} failed` : ''}`, succeeded > 0 && failed === 0 ? 'success' : 'warning');
+                    showToast(`Successfully uploaded ${succeeded} image(s)${failed > 0 ? `, ${failed} failed` : ''}`, failed === 0 ? 'success' : 'warning');
                 } else {
                     showToast('All uploads failed. Check console for details.', 'error');
                 }
@@ -59,24 +66,43 @@ export default function AdminMediaPage() {
 
             setUploadProgress({ current: index + 1, total: fileList.length });
 
-            const formData = new FormData();
-            formData.append('file', fileList[index]);
-            formData.append('altText', fileList[index].name);
-            formData.append('folder', 'media');
+            // Step 1: Upload directly from browser to Cloudinary (no Vercel payload limit)
+            const cloudinaryForm = new FormData();
+            cloudinaryForm.append('file', fileList[index]);
+            cloudinaryForm.append('upload_preset', uploadPreset);
 
-            fetch('/api/upload', { method: 'POST', body: formData })
+            fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+                method: 'POST',
+                body: cloudinaryForm,
+            })
                 .then(res => {
-                    if (!res.ok) {
-                        return res.json().then(err => {
-                            throw new Error(err.error || `HTTP ${res.status}`);
-                        });
-                    }
+                    if (!res.ok) return res.json().then(err => { throw new Error(err.error?.message || `Upload failed`); });
+                    return res.json();
+                })
+                .then(result => {
+                    // Step 2: Save metadata to DB via lightweight JSON endpoint
+                    return fetch('/api/upload', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            cloudinaryUrl: result.secure_url,
+                            publicId: result.public_id,
+                            altText: fileList[index].name,
+                            width: result.width,
+                            height: result.height,
+                            format: result.format,
+                            bytes: result.bytes,
+                        }),
+                    });
+                })
+                .then(res => {
+                    if (!res.ok) return res.json().then(err => { throw new Error(err.error || 'DB save failed'); });
                     succeeded++;
                     uploadNext(index + 1);
                 })
                 .catch(err => {
                     console.error(`Failed to upload "${fileList[index].name}":`, err);
-                    showToast(`Failed to upload ${fileList[index].name}: ${err.message}`, 'error');
+                    showToast(`Failed: ${fileList[index].name} — ${err.message}`, 'error');
                     failed++;
                     uploadNext(index + 1);
                 });
@@ -84,6 +110,7 @@ export default function AdminMediaPage() {
 
         uploadNext(0);
     }
+
 
     function handleDelete() {
         if (!deletingId) return;

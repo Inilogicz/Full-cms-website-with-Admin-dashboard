@@ -59,26 +59,35 @@ export default function AdminGalleryPage() {
             return;
         }
 
-        const uploadData = new FormData();
-        uploadData.append('file', file);
-        uploadData.append('folder', 'gallery');
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+        const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
-        fetch('/api/upload', {
+        if (!cloudName || !uploadPreset) {
+            setUploading(false);
+            showToast('Cloudinary is not configured', 'error');
+            return;
+        }
+
+        // Upload directly from browser to Cloudinary (no Vercel payload limit)
+        const cloudinaryForm = new FormData();
+        cloudinaryForm.append('file', file);
+        cloudinaryForm.append('upload_preset', uploadPreset);
+
+        fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
             method: 'POST',
-            body: uploadData
+            body: cloudinaryForm
         })
             .then(res => {
-                if (!res.ok) throw new Error('Upload failed');
+                if (!res.ok) return res.json().then(e => { throw new Error(e.error?.message || 'Cloudinary upload failed'); });
                 return res.json();
             })
-            .then(uploadResult => {
+            .then(result => {
                 const data = {
                     caption: fd.get('caption'),
                     category: fd.get('category'),
-                    imageUrl: uploadResult.cloudinaryUrl,
-                    publicId: uploadResult.publicId
+                    imageUrl: result.secure_url,
+                    publicId: result.public_id
                 };
-
                 return fetch('/api/gallery', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
