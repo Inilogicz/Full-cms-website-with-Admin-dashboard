@@ -43,30 +43,70 @@ export default function MediaPicker({ onSelect, onClose, currentId, allowMultipl
         const files = e.target.files;
         if (!files?.length) return;
 
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+        const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+        if (!cloudName || !uploadPreset) {
+            console.error('Cloudinary is not configured');
+            return;
+        }
+
+        const MAX_SIZE_MB = 10;
+        const oversized = Array.from(files).filter(f => f.size > MAX_SIZE_MB * 1024 * 1024);
+        if (oversized.length > 0) {
+            alert(`${oversized.map(f => f.name).join(', ')} exceed the ${MAX_SIZE_MB}MB limit.`);
+            e.target.value = '';
+            return;
+        }
+
         setUploading(true);
         const fileList = Array.from(files);
         setUploadProgress({ current: 1, total: fileList.length });
 
         const newItems: MediaItem[] = [];
-        
+
         for (let i = 0; i < fileList.length; i++) {
             setUploadProgress({ current: i + 1, total: fileList.length });
             const file = fileList[i];
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('altText', file.name);
 
             try {
-                const res = await fetch('/api/upload', { method: 'POST', body: formData });
-                const newItem = await res.json();
+                // Step 1: Upload directly from browser to Cloudinary
+                const cloudinaryForm = new FormData();
+                cloudinaryForm.append('file', file);
+                cloudinaryForm.append('upload_preset', uploadPreset);
+
+                const cloudRes = await fetch(
+                    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+                    { method: 'POST', body: cloudinaryForm }
+                );
+                if (!cloudRes.ok) {
+                    const err = await cloudRes.json();
+                    throw new Error(err.error?.message || 'Cloudinary upload failed');
+                }
+                const result = await cloudRes.json();
+
+                // Step 2: Save metadata to DB via lightweight JSON
+                const saveRes = await fetch('/api/upload', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        cloudinaryUrl: result.secure_url,
+                        publicId: result.public_id,
+                        altText: file.name,
+                        width: result.width,
+                        height: result.height,
+                        format: result.format,
+                        bytes: result.bytes,
+                    }),
+                });
+                const newItem = await saveRes.json();
                 newItems.push(newItem);
             } catch (err) {
-                console.error('Upload failed', err);
+                console.error(`Upload failed for "${file.name}":`, err);
             }
         }
 
         setMedia(prev => [...newItems, ...prev]);
-        
+
         // Auto-select in multi-mode, or select first and close in single-mode
         if (allowMultiple) {
             setLocalSelected(prev => [...prev, ...newItems]);
@@ -77,7 +117,9 @@ export default function MediaPicker({ onSelect, onClose, currentId, allowMultipl
 
         setUploading(false);
         setUploadProgress({ current: 0, total: 0 });
+        e.target.value = '';
     }
+
 
     const filtered = media.filter(m => (m.altText || '').toLowerCase().includes(search.toLowerCase()));
 
