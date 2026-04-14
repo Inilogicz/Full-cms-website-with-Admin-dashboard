@@ -7,7 +7,6 @@ export async function POST(req: NextRequest) {
         const formData = await req.formData();
         const file = formData.get('file') as File;
         const altText = formData.get('altText') as string;
-        const folder = (formData.get('folder') as string) || 'niger-sanitary';
 
         if (!file) return NextResponse.json({ error: 'No file provided' }, { status: 400 });
 
@@ -16,7 +15,7 @@ export async function POST(req: NextRequest) {
         const buffer = Buffer.from(bytes);
         const base64 = `data:${file.type};base64,${buffer.toString('base64')}`;
 
-        const result = await uploadImage(base64, folder);
+        const result = await uploadImage(base64);
 
         // Save to DB
         const media = await prisma.media.create({

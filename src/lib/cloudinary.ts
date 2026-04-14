@@ -1,6 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary';
 
-export async function uploadImage(file: string, folder: string = 'niger-sanitary') {
+export async function uploadImage(file: string) {
     try {
         // Configure inside the function to ensure environment variables are loaded
         cloudinary.config({
@@ -20,7 +20,6 @@ export async function uploadImage(file: string, folder: string = 'niger-sanitary
 
         const result = await cloudinary.uploader.upload(file, {
             resource_type: 'image',
-            folder,
         });
         return {
             url: result.secure_url,

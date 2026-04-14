@@ -61,7 +61,6 @@ export default function AdminGalleryPage() {
 
         const uploadData = new FormData();
         uploadData.append('file', file);
-        uploadData.append('folder', 'gallery');
 
         fetch('/api/upload', {
             method: 'POST',
