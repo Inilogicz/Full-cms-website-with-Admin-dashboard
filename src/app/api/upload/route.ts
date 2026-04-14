@@ -1,10 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-// This route now only saves Cloudinary metadata to the DB.
-// The actual file upload happens directly from the browser to Cloudinary
-// using an unsigned upload preset — bypassing Vercel's 4.5MB payload limit.
+// Accepts JSON metadata from a browser-side Cloudinary upload.
+// Files are uploaded directly browser → Cloudinary (unsigned preset) to avoid
+// Vercel's 4.5 MB serverless payload limit. Only the resulting metadata is sent here.
 export async function POST(req: NextRequest) {
+    const contentType = req.headers.get('content-type') || '';
+
+    if (!contentType.includes('application/json')) {
+        return NextResponse.json(
+            {
+                error: 'This endpoint only accepts JSON metadata. Upload the file directly to Cloudinary from the browser, then POST the resulting URL and metadata here.',
+                hint: 'content-type must be application/json',
+            },
+            { status: 415 }
+        );
+    }
+
     try {
         const data = await req.json();
         const { cloudinaryUrl, publicId, altText, width, height, format, bytes } = data;
@@ -18,10 +30,10 @@ export async function POST(req: NextRequest) {
                 cloudinaryUrl,
                 publicId,
                 altText: altText || '',
-                width: width || null,
-                height: height || null,
-                format: format || null,
-                bytes: bytes || null,
+                width: width ?? null,
+                height: height ?? null,
+                format: format ?? null,
+                bytes: bytes ?? null,
             },
         });
 
