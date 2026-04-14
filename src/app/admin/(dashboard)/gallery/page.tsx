@@ -208,6 +208,7 @@ export default function AdminGalleryPage() {
                                 </div>
                                 <input 
                                     id="file-input"
+                                    name="file"
                                     type="file" 
                                     accept="image/*" 
                                     onChange={(e) => {

@@ -40,11 +40,18 @@ export default function AdminMediaPage() {
         setUploadProgress({ current: 1, total: files.length });
 
         const fileList = Array.from(files);
+        let succeeded = 0;
+        let failed = 0;
+
         const uploadNext = (index: number) => {
             if (index >= fileList.length) {
                 setUploading(false);
                 setUploadProgress({ current: 0, total: 0 });
-                showToast(`Successfully uploaded ${fileList.length} image(s)`, 'success');
+                if (succeeded > 0) {
+                    showToast(`Successfully uploaded ${succeeded} image(s)${failed > 0 ? `, ${failed} failed` : ''}`, succeeded > 0 && failed === 0 ? 'success' : 'warning');
+                } else {
+                    showToast('All uploads failed. Check console for details.', 'error');
+                }
                 fetchMedia();
                 e.target.value = '';
                 return;
@@ -55,11 +62,22 @@ export default function AdminMediaPage() {
             const formData = new FormData();
             formData.append('file', fileList[index]);
             formData.append('altText', fileList[index].name);
+            formData.append('folder', 'media');
 
             fetch('/api/upload', { method: 'POST', body: formData })
-                .then(() => uploadNext(index + 1))
-                .catch(() => {
-                    showToast(`Failed to upload ${fileList[index].name}`, 'error');
+                .then(res => {
+                    if (!res.ok) {
+                        return res.json().then(err => {
+                            throw new Error(err.error || `HTTP ${res.status}`);
+                        });
+                    }
+                    succeeded++;
+                    uploadNext(index + 1);
+                })
+                .catch(err => {
+                    console.error(`Failed to upload "${fileList[index].name}":`, err);
+                    showToast(`Failed to upload ${fileList[index].name}: ${err.message}`, 'error');
+                    failed++;
                     uploadNext(index + 1);
                 });
         };

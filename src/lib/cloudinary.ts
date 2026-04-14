@@ -20,6 +20,7 @@ export async function uploadImage(file: string, folder: string = 'niger-sanitary
 
         const result = await cloudinary.uploader.upload(file, {
             resource_type: 'image',
+            folder,
         });
         return {
             url: result.secure_url,
