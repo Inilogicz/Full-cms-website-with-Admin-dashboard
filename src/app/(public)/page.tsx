@@ -14,7 +14,7 @@ export default async function HomePage() {
         })
     ]);
 
-    const jsonLd = {
+    const organizationJsonLd = {
         '@context': 'https://schema.org',
         '@type': 'Organization',
         name: 'Niger Sanitary Industry Limited',
@@ -22,7 +22,7 @@ export default async function HomePage() {
         logo: 'https://nigersanitary.com/logo.png',
         contactPoint: {
             '@type': 'ContactPoint',
-            telephone: '+234-XXX-XXXXXXX', // I should check if I can find the actual phone
+            telephone: '+234-XXX-XXXXXXX',
             contactType: 'customer service',
             areaServed: 'NG',
             availableLanguage: 'en',
@@ -30,15 +30,30 @@ export default async function HomePage() {
         sameAs: [
             'https://facebook.com/nigersanitary',
             'https://instagram.com/nigersanitary',
-            // Add other social links if found
         ],
+    };
+
+    const websiteJsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: 'Niger Sanitary',
+        url: 'https://nigersanitary.com',
+        potentialAction: {
+            '@type': 'SearchAction',
+            target: 'https://nigersanitary.com/search?q={search_term_string}',
+            'query-input': 'required name=search_term_string'
+        }
     };
 
     return (
         <>
             <script
                 type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
             />
             <HomeClient 
                 settings={settings} 
@@ -47,4 +62,5 @@ export default async function HomePage() {
         </>
     );
 }
+
 

@@ -12,7 +12,12 @@ import {
   ArrowRight,
 } from 'lucide-react';
 
-import FloatingProductBackground from '@/components/shared/FloatingProductBackground';
+import dynamicImport from 'next/dynamic';
+const FloatingProductBackground = dynamicImport(() => import('@/components/shared/FloatingProductBackground'), {
+  ssr: false,
+});
+
+
 
 // Custom Crafted Icons
 const CraftedShield = () => (

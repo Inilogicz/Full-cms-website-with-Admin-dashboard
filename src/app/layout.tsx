@@ -1,5 +1,13 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://nigersanitary.com"), // Assuming this is the domain, will use relative paths elsewhere
@@ -61,12 +69,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning>
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <body className="antialiased" suppressHydrationWarning>
         <ToastProvider>
           {children}
         </ToastProvider>
       </body>
     </html>
+
   );
 }
