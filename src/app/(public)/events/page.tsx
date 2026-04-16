@@ -1,9 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import EventsContent from '@/components/events/EventsContent';
-import dynamicImport from 'next/dynamic';
-const FloatingProductBackground = dynamicImport(() => import('@/components/shared/FloatingProductBackground'), {
-    ssr: false,
-});
+import FloatingProductBackground from '@/components/shared/FloatingProductBackground';
+
 
 
 
