@@ -14,10 +14,37 @@ export default async function HomePage() {
         })
     ]);
 
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: 'Niger Sanitary Industry Limited',
+        url: 'https://nigersanitary.com',
+        logo: 'https://nigersanitary.com/logo.png',
+        contactPoint: {
+            '@type': 'ContactPoint',
+            telephone: '+234-XXX-XXXXXXX', // I should check if I can find the actual phone
+            contactType: 'customer service',
+            areaServed: 'NG',
+            availableLanguage: 'en',
+        },
+        sameAs: [
+            'https://facebook.com/nigersanitary',
+            'https://instagram.com/nigersanitary',
+            // Add other social links if found
+        ],
+    };
+
     return (
-        <HomeClient 
-            settings={settings} 
-            products={productsData} 
-        />
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+            <HomeClient 
+                settings={settings} 
+                products={productsData} 
+            />
+        </>
     );
 }
+

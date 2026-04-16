@@ -20,8 +20,47 @@ type PageProps = {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { slug } = await params;
-    const post = defaultBlogPosts[slug];
-    return { title: post?.title || 'Blog Post' };
+    
+    let post = defaultBlogPosts[slug];
+    try {
+        const dbPost = await prisma.blogPost.findUnique({ where: { slug } });
+        if (dbPost) {
+            post = {
+                title: dbPost.title,
+                content: dbPost.content,
+                category: dbPost.category,
+                publishedAt: dbPost.publishedAt || dbPost.createdAt,
+            } as any;
+        }
+    } catch {}
+
+    if (post) {
+        const title = `${post.title} | Niger Sanitary Blog`;
+        const description = post.content.replace(/<[^>]*>/g, '').substring(0, 160);
+        const url = `https://nigersanitary.com/blog/${slug}`;
+
+        return {
+            title,
+            description,
+            alternates: {
+                canonical: url,
+            },
+            openGraph: {
+                title,
+                description,
+                url,
+                type: 'article',
+                publishedTime: post.publishedAt.toISOString(),
+            },
+            twitter: {
+                card: 'summary_large_image',
+                title,
+                description,
+            },
+        };
+    }
+
+    return { title: 'Blog Post' };
 }
 
 export default async function BlogPostPage({ params }: PageProps) {
@@ -44,8 +83,25 @@ export default async function BlogPostPage({ params }: PageProps) {
 
     if (!post) notFound();
 
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        headline: post.title,
+        description: post.content.replace(/<[^>]*>/g, '').substring(0, 160),
+        image: post.featuredImage || 'https://nigersanitary.com/og-image.jpg',
+        datePublished: post.publishedAt.toISOString(),
+        author: {
+            '@type': 'Organization',
+            name: 'Niger Sanitary Industry Limited',
+        },
+    };
+
     return (
         <section style={{ paddingTop: '120px', paddingBottom: '80px' }}>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             <div className="container" style={{ maxWidth: '840px' }}>
                 <Link href="/blog" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'var(--primary)', fontWeight: 500, fontSize: '0.9375rem', marginBottom: '32px' }}>
                     <ArrowLeft size={18} /> Back to Blog

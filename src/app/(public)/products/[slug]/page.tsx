@@ -13,13 +13,42 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const { slug } = await params;
     
     const dbProduct = await prisma.product.findUnique({
-        where: { slug }
+        where: { slug },
+        include: { images: true }
     });
 
     if (dbProduct) {
+        const title = `${dbProduct.name} | Niger Sanitary Industry Limited`;
+        const description = dbProduct.description?.substring(0, 160) || `Learn more about ${dbProduct.name} by Niger Sanitary.`;
+        const url = `https://nigersanitary.com/products/${slug}`;
+        const ogImage = dbProduct.images[0]?.cloudinaryUrl || '/og-image.jpg';
+
         return { 
-            title: `${dbProduct.name} | Niger Sanitary`, 
-            description: dbProduct.description?.substring(0, 160) 
+            title, 
+            description,
+            alternates: {
+                canonical: url,
+            },
+            openGraph: {
+                title,
+                description,
+                url,
+                type: 'website',
+                images: [
+                    {
+                        url: ogImage,
+                        width: 1200,
+                        height: 630,
+                        alt: dbProduct.name,
+                    },
+                ],
+            },
+            twitter: {
+                card: 'summary_large_image',
+                title,
+                description,
+                images: [ogImage],
+            },
         };
     }
 
@@ -48,6 +77,25 @@ export default async function ProductDetailPage({ params }: PageProps) {
     const images = dbProduct.images;
     const specs = product.specifications || {};
 
+    const jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: product.name,
+        description: product.description,
+        image: images.map(img => img.cloudinaryUrl),
+        category: product.category,
+        brand: {
+            '@type': 'Brand',
+            name: 'Niger Sanitary Industry Limited',
+        },
+        offers: {
+            '@type': 'Offer',
+            availability: 'https://schema.org/InStock',
+            url: `https://nigersanitary.com/products/${slug}`,
+            priceCurrency: 'NGN',
+        },
+    };
+
     // Dynamic suggested products
     const related = await prisma.product.findMany({
         where: {
@@ -67,7 +115,12 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
     return (
         <div className="product-detail-wrapper" style={{ background: '#FDFDFF' }}>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             <section style={{ paddingTop: '160px', paddingBottom: '100px' }}>
+
                 <div className="container">
                     <Link href="/products" style={{
                         display: 'inline-flex',
