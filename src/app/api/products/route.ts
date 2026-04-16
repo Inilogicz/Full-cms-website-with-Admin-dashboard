@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
                 applications: data.applications,
                 packaging: data.packaging,
                 status: data.status || 'published',
+                isFeatured: data.isFeatured || false,
                 images: data.imageIds ? {
                     connect: data.imageIds.map((id: string) => ({ id }))
                 } : undefined

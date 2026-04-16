@@ -8,8 +8,7 @@ export default async function HomePage() {
     const [settings, productsData] = await Promise.all([
         prisma.homeConfig.findUnique({ where: { id: 'global' } }),
         prisma.product.findMany({
-            where: { status: 'published' },
-            take: 4,
+            where: { status: 'published', isFeatured: true },
             include: { images: true },
             orderBy: { createdAt: 'desc' }
         })

@@ -26,6 +26,7 @@ model Product {
   applications   String?  @db.Text
   packaging      String?  @db.Text
   status         String   @default("published") // draft, published, archived
+  isFeatured     Boolean  @default(false)
   images         Media[]  @relation("ProductImages")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

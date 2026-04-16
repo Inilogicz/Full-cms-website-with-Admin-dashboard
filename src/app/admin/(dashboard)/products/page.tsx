@@ -13,6 +13,7 @@ interface Media {
 
 interface Product {
     id: string; name: string; slug: string; description: string; category: string; status: string; createdAt: string;
+    isFeatured: boolean;
     images?: Media[];
     applications?: string;
     packaging?: string;
@@ -66,6 +67,7 @@ export default function AdminProductsPage() {
             applications: formData.get('applications'),
             packaging: formData.get('packaging'),
             status: formData.get('status'),
+            isFeatured: formData.get('isFeatured') === 'true',
             imageIds: selectedImages.map(img => img.id),
             specifications: formSpecs.reduce((acc, curr) => {
                 if (curr.key.trim()) acc[curr.key.trim()] = curr.value;
@@ -158,6 +160,18 @@ export default function AdminProductsPage() {
                                     <option value="published">Published</option>
                                     <option value="archived">Archived</option>
                                 </select>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                                    <input 
+                                        type="checkbox" 
+                                        name="isFeatured" 
+                                        value="true" 
+                                        defaultChecked={editing?.isFeatured} 
+                                        style={{ width: '16px', height: '16px' }}
+                                    />
+                                    <span>Featured on Homepage</span>
+                                </label>
                             </div>
 
                             <div className="form-group">
@@ -309,7 +323,7 @@ export default function AdminProductsPage() {
                         <div className="table-container">
                             <table className="table">
                                 <thead>
-                                    <tr><th>Name</th><th className="hide-mobile">Category</th><th className="hide-mobile">Status</th><th>Actions</th></tr>
+                                    <tr><th>Name</th><th className="hide-mobile">Category</th><th className="hide-mobile">Status</th><th className="hide-mobile">Featured</th><th>Actions</th></tr>
                                 </thead>
                                 <tbody>
                                     {filtered.length === 0 ? (
@@ -329,6 +343,13 @@ export default function AdminProductsPage() {
                                             </td>
                                             <td className="hide-mobile"><span className="badge badge-primary">{p.category}</span></td>
                                             <td className="hide-mobile"><span className={`badge badge-${p.status === 'published' ? 'success' : p.status === 'draft' ? 'warning' : 'info'}`}>{p.status}</span></td>
+                                            <td className="hide-mobile">
+                                                {p.isFeatured ? (
+                                                    <span className="badge" style={{ background: 'var(--gold-light)', color: 'var(--gold-dark)', border: '1px solid var(--gold)' }}>Featured</span>
+                                                ) : (
+                                                    <span style={{ color: 'var(--gray-300)', fontSize: '0.75rem' }}>No</span>
+                                                )}
+                                            </td>
                                             <td>
                                                 <div style={{ display: 'flex', gap: '4px' }}>
                                                     <button className="btn btn-ghost btn-sm btn-icon" onClick={(e) => { e.stopPropagation(); setEditing(p); setShowForm(true); }}><Edit2 size={14} /></button>

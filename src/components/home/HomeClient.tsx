@@ -286,7 +286,20 @@ export default function HomeClient({ settings, products }: HomeClientProps) {
                     style={{ width: '100%', height: '220px', objectFit: 'contain' }} 
                   />
                   <h3 style={{ fontSize: '1.25rem', fontWeight: 900, marginTop: '24px', color: 'var(--primary-dark)' }}>{product.name}</h3>
-                  <p style={{ fontSize: '0.875rem', color: 'var(--gray-500)', marginTop: '12px', lineHeight: 1.6 }}>{product.description}</p>
+                  <p style={{ 
+                    fontSize: '0.875rem', 
+                    color: 'var(--gray-500)', 
+                    marginTop: '12px', 
+                    lineHeight: 1.6,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    minHeight: '4.8em' // 3 lines * 1.6 line-height
+                  }}>
+                    {product.description}
+                  </p>
                   <div style={{ 
                     marginTop: '24px', 
                     display: 'flex', 

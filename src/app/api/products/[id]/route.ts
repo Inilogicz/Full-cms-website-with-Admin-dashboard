@@ -30,6 +30,7 @@ export async function PUT(req: NextRequest, context: RouteContext) {
                 applications: data.applications,
                 packaging: data.packaging,
                 status: data.status,
+                isFeatured: data.isFeatured,
                 images: data.imageIds ? {
                     set: data.imageIds.map((id: string) => ({ id }))
                 } : undefined
