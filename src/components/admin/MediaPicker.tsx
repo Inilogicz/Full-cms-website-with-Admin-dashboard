@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Upload, X, Check, Search, Image as ImageIcon } from 'lucide-react';
+import { Upload, X, Check, Search, Image as ImageIcon, Video } from 'lucide-react';
 
 interface MediaItem {
     id: string;
     cloudinaryUrl: string;
+    resourceType: string;
     altText: string;
 }
 
@@ -50,10 +51,17 @@ export default function MediaPicker({ onSelect, onClose, currentId, allowMultipl
             return;
         }
 
-        const MAX_SIZE_MB = 4;
-        const oversized = Array.from(files).filter(f => f.size > MAX_SIZE_MB * 1024 * 1024);
+        const MAX_IMAGE_SIZE_MB = 10;
+        const MAX_VIDEO_SIZE_MB = 100;
+        
+        const oversized = Array.from(files).filter(f => {
+            const isVideo = f.type.startsWith('video/');
+            const limit = isVideo ? MAX_VIDEO_SIZE_MB : MAX_IMAGE_SIZE_MB;
+            return f.size > limit * 1024 * 1024;
+        });
+
         if (oversized.length > 0) {
-            alert(`File too large: ${oversized.map(f => `${f.name} (${(f.size / 1024 / 1024).toFixed(1)}MB)`).join(', ')}. Maximum upload size is ${MAX_SIZE_MB}MB. Please compress or resize before uploading.`);
+            alert(`Some files are too large: ${oversized.map(f => `${f.name} (${(f.size / 1024 / 1024).toFixed(1)}MB)`).join(', ')}. Maximum size is ${MAX_IMAGE_SIZE_MB}MB for images and ${MAX_VIDEO_SIZE_MB}MB for videos.`);
             e.target.value = '';
             return;
         }
@@ -74,8 +82,11 @@ export default function MediaPicker({ onSelect, onClose, currentId, allowMultipl
                 cloudinaryForm.append('file', file);
                 cloudinaryForm.append('upload_preset', uploadPreset);
 
+                const isVideo = file.type.startsWith('video/');
+                const endpoint = isVideo ? 'video' : 'image';
+
                 const cloudRes = await fetch(
-                    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+                    `https://api.cloudinary.com/v1_1/${cloudName}/${endpoint}/upload`,
                     { method: 'POST', body: cloudinaryForm }
                 );
                 if (!cloudRes.ok) {
@@ -91,6 +102,7 @@ export default function MediaPicker({ onSelect, onClose, currentId, allowMultipl
                     body: JSON.stringify({
                         cloudinaryUrl: result.secure_url,
                         publicId: result.public_id,
+                        resourceType: result.resource_type || (isVideo ? 'video' : 'image'),
                         altText: file.name,
                         width: result.width,
                         height: result.height,
@@ -161,7 +173,7 @@ export default function MediaPicker({ onSelect, onClose, currentId, allowMultipl
                     </div>
                     <label className="btn btn-primary" style={{ height: '40px', padding: '0 16px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                         <Upload size={16} /> {uploading ? `Uploading ${uploadProgress.current}/${uploadProgress.total}...` : 'Upload New'}
-                        <input type="file" accept="image/*" multiple={allowMultiple} style={{ display: 'none' }} onChange={handleUpload} disabled={uploading} />
+                        <input type="file" accept="image/*,video/*" multiple={allowMultiple} style={{ display: 'none' }} onChange={handleUpload} disabled={uploading} />
                     </label>
                 </div>
 
@@ -176,7 +188,7 @@ export default function MediaPicker({ onSelect, onClose, currentId, allowMultipl
                     ) : filtered.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '80px 20px', color: 'var(--gray-400)' }}>
                             <ImageIcon size={48} style={{ marginBottom: '16px', opacity: 0.2 }} />
-                            <p>No images found in library</p>
+                             <p>No media found in library</p>
                         </div>
                     ) : (
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '16px' }}>
@@ -200,7 +212,35 @@ export default function MediaPicker({ onSelect, onClose, currentId, allowMultipl
                                             transition: 'all 0.2s ease',
                                         }}
                                     >
-                                        <img src={item.cloudinaryUrl} alt={item.altText} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        {item.resourceType === 'video' ? (
+                                            <div style={{ width: '100%', height: '100%', background: 'var(--gray-900)', position: 'relative' }}>
+                                                <video
+                                                    src={item.cloudinaryUrl}
+                                                    muted
+                                                    playsInline
+                                                    loop
+                                                    autoPlay
+                                                    onMouseOver={e => e.currentTarget.play()}
+                                                    onMouseOut={e => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                />
+                                                <div style={{
+                                                    position: 'absolute',
+                                                    inset: 0,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    pointerEvents: 'none'
+                                                }}>
+                                                    <Video size={24} color="white" opacity={0.6} />
+                                                </div>
+                                                <div style={{ position: 'absolute', bottom: 6, left: 6, background: 'rgba(0,0,0,0.5)', color: 'white', fontSize: '9px', padding: '1px 4px', borderRadius: '3px', fontWeight: 700 }}>
+                                                    VIDEO
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <img src={item.cloudinaryUrl} alt={item.altText} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        )}
                                         {isSelected && (
                                             <div style={{ position: 'absolute', top: 8, right: 8, background: 'var(--primary)', color: 'white', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                 <Check size={12} />

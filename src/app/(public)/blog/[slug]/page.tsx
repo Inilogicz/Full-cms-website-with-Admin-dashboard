@@ -36,7 +36,8 @@ export default async function BlogPostPage({ params }: PageProps) {
                 content: dbPost.content,
                 category: dbPost.category,
                 publishedAt: dbPost.publishedAt || new Date(),
-                featuredImage: dbPost.featuredImage
+                featuredImage: dbPost.featuredImage,
+                featuredImageResourceType: dbPost.featuredImageResourceType
             };
         }
     } catch { /* defaults */ }

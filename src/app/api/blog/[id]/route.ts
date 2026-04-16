@@ -30,6 +30,7 @@ export async function PUT(req: NextRequest, context: RouteContext) {
                 status: data.status,
                 featured: data.featured,
                 featuredImage: data.featuredImage,
+                featuredImageResourceType: data.featuredImageResourceType,
                 publishedAt: data.status === 'published' ? new Date() : undefined,
             },
         });

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma'; // Refreshed
 
 export async function GET() {
     try {
@@ -19,8 +19,9 @@ export async function POST(req: NextRequest) {
                 category: data.category,
                 imageUrl: data.imageUrl,
                 publicId: data.publicId,
+                resourceType: data.resourceType || data.type || 'image',
                 order: data.order || 0,
-            },
+            } as any,
         });
         return NextResponse.json(item);
     } catch {

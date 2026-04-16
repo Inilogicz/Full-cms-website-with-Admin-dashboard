@@ -13,11 +13,12 @@ export default async function GalleryPage() {
         <div className="gallery-wrapper">
             <GalleryHero />
 
-            <GalleryContent items={items.map(item => ({
+            <GalleryContent items={items.map((item: any) => ({
                 id: item.id,
                 caption: item.caption,
                 category: item.category,
-                imageUrl: item.imageUrl
+                imageUrl: item.imageUrl,
+                resourceType: item.resourceType
             }))} />
         </div>
     );

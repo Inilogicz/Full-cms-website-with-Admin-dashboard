@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
                 data: {
                     cloudinaryUrl,
                     publicId,
+                    resourceType: data.resourceType || 'image',
                     altText: altText || '',
                     width: width ?? null,
                     height: height ?? null,
@@ -67,7 +68,7 @@ export async function POST(req: NextRequest) {
             cloudinaryForm.append('upload_preset', uploadPreset);
 
             const cloudRes = await fetch(
-                `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+                `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,
                 { method: 'POST', body: cloudinaryForm }
             );
 
@@ -86,6 +87,7 @@ export async function POST(req: NextRequest) {
                 data: {
                     cloudinaryUrl: result.secure_url,
                     publicId: result.public_id,
+                    resourceType: result.resource_type || 'image',
                     altText: altText || file.name,
                     width: result.width ?? null,
                     height: result.height ?? null,

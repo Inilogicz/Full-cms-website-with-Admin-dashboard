@@ -170,7 +170,7 @@ export default function GalleryHero() {
                         }} className="hover:scale-105">
                             Start Journey
                         </button>
-                        <button style={{
+                        {/* <button style={{
                             background: 'rgba(255,255,255,0.05)',
                             backdropFilter: 'blur(10px)',
                             color: 'white',
@@ -185,7 +185,7 @@ export default function GalleryHero() {
                             gap: '12px'
                         }}>
                             <Play size={20} fill="currentColor" /> Watch Brand Film
-                        </button>
+                        </button> */}
                     </motion.div>
 
                     {/* Quick Stats in Hero */}

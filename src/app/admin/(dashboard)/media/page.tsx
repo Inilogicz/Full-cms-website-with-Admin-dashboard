@@ -6,7 +6,7 @@ import { useToast } from '@/context/ToastContext';
 import ConfirmModal from '@/components/ui/ConfirmModal';
 
 interface MediaItem {
-    id: string; cloudinaryUrl: string; publicId: string; altText: string;
+    id: string; cloudinaryUrl: string; publicId: string; resourceType: string; altText: string;
     width: number; height: number; format: string; bytes: number; uploadedAt: string;
 }
 
@@ -43,11 +43,18 @@ export default function AdminMediaPage() {
             return;
         }
 
-        const MAX_SIZE_MB = 4;
-        const oversized = Array.from(files).filter(f => f.size > MAX_SIZE_MB * 1024 * 1024);
+        const MAX_IMAGE_SIZE_MB = 10;
+        const MAX_VIDEO_SIZE_MB = 100;
+        
+        const oversized = Array.from(files).filter(f => {
+            const isVideo = f.type.startsWith('video/');
+            const limit = isVideo ? MAX_VIDEO_SIZE_MB : MAX_IMAGE_SIZE_MB;
+            return f.size > limit * 1024 * 1024;
+        });
+
         if (oversized.length > 0) {
             showToast(
-                `File too large: ${oversized.map(f => `${f.name} (${(f.size / 1024 / 1024).toFixed(1)}MB)`).join(', ')}. Maximum upload size is ${MAX_SIZE_MB}MB. Please compress or resize your image before uploading.`,
+                `File too large: ${oversized.map(f => `${f.name} (${(f.size / 1024 / 1024).toFixed(1)}MB)`).join(', ')}. Max size: ${MAX_IMAGE_SIZE_MB}MB for images, ${MAX_VIDEO_SIZE_MB}MB for videos.`,
                 'error'
             );
             e.target.value = '';
@@ -66,7 +73,7 @@ export default function AdminMediaPage() {
                 setUploading(false);
                 setUploadProgress({ current: 0, total: 0 });
                 if (succeeded > 0) {
-                    showToast(`Successfully uploaded ${succeeded} image(s)${failed > 0 ? `, ${failed} failed` : ''}`, failed === 0 ? 'success' : 'warning');
+                    showToast(`Successfully uploaded ${succeeded} file(s)${failed > 0 ? `, ${failed} failed` : ''}`, failed === 0 ? 'success' : 'warning');
                 } else {
                     showToast('All uploads failed. Check console for details.', 'error');
                 }
@@ -82,7 +89,10 @@ export default function AdminMediaPage() {
             cloudinaryForm.append('file', fileList[index]);
             cloudinaryForm.append('upload_preset', uploadPreset);
 
-            fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+            const isVideo = fileList[index].type.startsWith('video/');
+            const endpoint = isVideo ? 'video' : 'image';
+            
+            fetch(`https://api.cloudinary.com/v1_1/${cloudName}/${endpoint}/upload`, {
                 method: 'POST',
                 body: cloudinaryForm,
             })
@@ -96,8 +106,7 @@ export default function AdminMediaPage() {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            cloudinaryUrl: result.secure_url,
-                            publicId: result.public_id,
+                            resourceType: result.resource_type || (isVideo ? 'video' : 'image'),
                             altText: fileList[index].name,
                             width: result.width,
                             height: result.height,
@@ -129,11 +138,11 @@ export default function AdminMediaPage() {
         fetch(`/api/media/${deletingId}`, { method: 'DELETE' })
             .then(res => {
                 if (!res.ok) throw new Error();
-                showToast('Image deleted successfully', 'success');
+                showToast('Media deleted successfully', 'success');
                 setDeletingId(null);
                 fetchMedia();
             })
-            .catch(() => showToast('Failed to delete image', 'error'))
+            .catch(() => showToast('Failed to delete media', 'error'))
             .finally(() => setIsDeleting(false));
     }
 
@@ -156,8 +165,8 @@ export default function AdminMediaPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                 <h1 style={{ fontSize: '1.5rem' }}>Media Manager</h1>
                 <label className="btn btn-primary" style={{ cursor: 'pointer' }}>
-                    <Upload size={16} /> {uploading ? `Uploading ${uploadProgress.current}/${uploadProgress.total}...` : 'Upload Images'}
-                    <input type="file" accept="image/*" multiple onChange={handleUpload} style={{ display: 'none' }} disabled={uploading} />
+                    <Upload size={16} /> {uploading ? `Uploading ${uploadProgress.current}/${uploadProgress.total}...` : 'Upload Media'}
+                    <input type="file" accept="image/*,video/*" multiple onChange={handleUpload} style={{ display: 'none' }} disabled={uploading} />
                 </label>
             </div>
 
@@ -173,14 +182,25 @@ export default function AdminMediaPage() {
             ) : filtered.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '80px 20px', color: 'var(--gray-400)' }}>
                     <ImageIcon size={48} style={{ marginBottom: '16px', opacity: 0.3 }} />
-                    <p>No media files. Upload images to get started.</p>
+                    <p>No media files. Upload images or videos to get started.</p>
                 </div>
             ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '16px' }}>
                     {filtered.map(item => (
                         <div key={item.id} className="card" style={{ overflow: 'hidden' }}>
-                            <div style={{ aspectRatio: '1', position: 'relative', background: 'var(--gray-100)' }}>
-                                <img src={item.cloudinaryUrl} alt={item.altText || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <div style={{ aspectRatio: '1', position: 'relative', background: 'var(--gray-100)', overflow: 'hidden' }}>
+                                {item.resourceType === 'video' ? (
+                                    <video
+                                        src={item.cloudinaryUrl}
+                                        muted
+                                        playsInline
+                                        loop
+                                        autoPlay
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                    />
+                                ) : (
+                                    <img src={item.cloudinaryUrl} alt={item.altText || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                )}
                             </div>
                             <div style={{ padding: '12px 16px' }}>
                                 <p style={{ fontSize: '0.8125rem', fontWeight: 500, marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.altText || item.publicId}</p>
@@ -204,7 +224,7 @@ export default function AdminMediaPage() {
             <ConfirmModal 
                 isOpen={!!deletingId}
                 title="Delete Media"
-                message="Are you sure you want to delete this image? This action cannot be undone and will remove it from Cloudinary and the database."
+                message="Are you sure you want to delete this media? This action cannot be undone and will remove it from Cloudinary and the database."
                 onConfirm={handleDelete}
                 onClose={() => setDeletingId(null)}
                 confirmText="Delete"

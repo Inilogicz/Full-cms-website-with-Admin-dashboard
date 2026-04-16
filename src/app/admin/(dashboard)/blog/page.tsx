@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Search, Image as ImageIcon, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, Image as ImageIcon, X, Video } from 'lucide-react';
 import MediaPicker from '@/components/admin/MediaPicker';
 import { useToast } from '@/context/ToastContext';
 import ConfirmModal from '@/components/ui/ConfirmModal';
@@ -15,6 +15,7 @@ interface BlogPost {
     status: string;
     featured: boolean;
     featuredImage?: string;
+    featuredImageResourceType?: string;
     content: string;
     excerpt?: string;
     publishedAt: string;
@@ -30,6 +31,7 @@ export default function AdminBlogPage() {
     const [search, setSearch] = useState('');
     const [showMediaPicker, setShowMediaPicker] = useState(false);
     const [featuredImage, setFeaturedImage] = useState<string | null>(null);
+    const [featuredImageResourceType, setFeaturedImageResourceType] = useState<string>('image');
     const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
     const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
@@ -48,8 +50,10 @@ export default function AdminBlogPage() {
     useEffect(() => {
         if (editing) {
             setFeaturedImage(editing.featuredImage || null);
+            setFeaturedImageResourceType(editing.featuredImageResourceType || 'image');
         } else {
             setFeaturedImage(null);
+            setFeaturedImageResourceType('image');
         }
     }, [editing, showForm]);
 
@@ -64,6 +68,7 @@ export default function AdminBlogPage() {
             status: fd.get('status'),
             featured: fd.get('featured') === 'on',
             featuredImage: featuredImage,
+            featuredImageResourceType: featuredImageResourceType,
         };
         const url = editing ? `/api/blog/${editing.id}` : '/api/blog';
         fetch(url, {
@@ -129,10 +134,14 @@ export default function AdminBlogPage() {
                                 <label className="form-label">Featured Image</label>
                                 {featuredImage ? (
                                     <div style={{ position: 'relative', width: '100%', maxWidth: '240px', aspectRatio: '16/9', borderRadius: 'var(--radius-md)', overflow: 'hidden', marginBottom: '12px' }}>
-                                        <img src={featuredImage} alt="Featured" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        {featuredImageResourceType === 'video' ? (
+                                            <video src={featuredImage!} style={{ width: '100%', height: '100%', objectFit: 'cover' }} muted playsInline autoPlay loop />
+                                        ) : (
+                                            <img src={featuredImage!} alt="Featured" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        )}
                                         <button
                                             type="button"
-                                            onClick={() => setFeaturedImage(null)}
+                                            onClick={() => { setFeaturedImage(null); setFeaturedImageResourceType('image'); }}
                                             style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.5)', color: 'white', border: 'none', borderRadius: '50%', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
                                         >
                                             <X size={14} />
@@ -145,7 +154,7 @@ export default function AdminBlogPage() {
                                         style={{ width: '100%', maxWidth: '240px', aspectRatio: '16/9', border: '2px dashed var(--gray-200)', borderRadius: 'var(--radius-md)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--gray-400)', background: 'none', cursor: 'pointer', marginBottom: '12px' }}
                                     >
                                         <ImageIcon size={24} />
-                                        <span style={{ fontSize: '0.8125rem' }}>Select Image</span>
+                                        <span style={{ fontSize: '0.8125rem' }}>Select Media (Image/Video)</span>
                                     </button>
                                 )}
                             </div>
@@ -196,10 +205,15 @@ export default function AdminBlogPage() {
                         
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                             <div style={{ width: '100%', aspectRatio: '16/9', borderRadius: 'var(--radius-lg)', overflow: 'hidden', background: 'var(--gray-100)' }}>
-                                {selectedPost.featuredImage ? 
-                                    <img src={selectedPost.featuredImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 
+                                {selectedPost.featuredImage ? (
+                                    selectedPost.featuredImageResourceType === 'video' ? (
+                                        <video src={selectedPost.featuredImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} muted playsInline autoPlay loop />
+                                    ) : (
+                                        <img src={selectedPost.featuredImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    )
+                                ) : (
                                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gray-300)' }}><ImageIcon size={48} /></div>
-                                }
+                                )}
                             </div>
                             
                             <div>
@@ -249,8 +263,14 @@ export default function AdminBlogPage() {
                                 <tr key={p.id} className="table-row" onClick={() => { if (window.innerWidth <= 768) setSelectedPost(p) }}>
                                     <td>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                            <div style={{ width: 44, height: 32, borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: 'var(--gray-100)', flexShrink: 0 }}>
-                                                {p.featuredImage ? <img src={p.featuredImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" /> : <ImageIcon size={16} style={{ margin: 8, color: 'var(--gray-300)' }} />}
+                                            <div style={{ width: 44, height: 32, borderRadius: 'var(--radius-sm)', overflow: 'hidden', background: 'var(--gray-100)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                {p.featuredImage ? (
+                                                    p.featuredImageResourceType === 'video' ? (
+                                                        <Video size={16} style={{ color: 'var(--gray-400)' }} />
+                                                    ) : (
+                                                        <img src={p.featuredImage} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+                                                    )
+                                                ) : <ImageIcon size={16} style={{ color: 'var(--gray-300)' }} />}
                                             </div>
                                             <div>
                                                 <div style={{ fontWeight: 600, color: 'var(--gray-900)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '300px' }}>{p.title}</div>
@@ -290,7 +310,10 @@ export default function AdminBlogPage() {
 
             {showMediaPicker && (
                 <MediaPicker
-                    onSelect={(item) => setFeaturedImage(item.cloudinaryUrl)}
+                    onSelect={(item) => {
+                        setFeaturedImage(item.cloudinaryUrl);
+                        setFeaturedImageResourceType(item.resourceType);
+                    }}
                     onClose={() => setShowMediaPicker(false)}
                     currentId={"" /* We match by URL for blog */}
                 />

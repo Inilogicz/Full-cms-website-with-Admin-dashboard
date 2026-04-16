@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Factory, ShieldCheck, Package, Users, Eye, Image as ImageIcon, X, ChevronLeft, ChevronRight, Maximize2, XCircle } from 'lucide-react';
+import { Factory, ShieldCheck, Package, Users, Eye, Image as ImageIcon, X, ChevronLeft, ChevronRight, Maximize2, XCircle, Play } from 'lucide-react';
 
 interface GalleryItem {
     id: string;
     caption: string | null;
     category: string | null;
     imageUrl: string;
+    resourceType?: string;
 }
 
 interface GalleryContentProps {
@@ -155,16 +156,47 @@ export default function GalleryContent({ items }: GalleryContentProps) {
                                                 border: '1px solid #f1f5f9',
                                                 transition: 'all 0.5s ease'
                                             }}>
-                                                <img
-                                                    src={item.imageUrl}
-                                                    alt={item.caption || 'Gallery Image'}
-                                                    style={{
-                                                        width: '100%',
-                                                        display: 'block',
-                                                        transition: 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)'
-                                                    }}
-                                                    className="gallery-image"
-                                                />
+                                                {item.resourceType === 'video' ? (
+                                                    <div style={{ position: 'relative', aspectRatio: '4/3', background: '#000' }}>
+                                                        <video
+                                                            src={item.imageUrl}
+                                                            muted
+                                                            playsInline
+                                                            loop
+                                                            autoPlay
+                                                            onMouseOver={e => e.currentTarget.play()}
+                                                            onMouseOut={e => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
+                                                            style={{
+                                                                width: '100%',
+                                                                height: '100%',
+                                                                objectFit: 'cover',
+                                                                display: 'block'
+                                                            }}
+                                                        />
+                                                        <div style={{
+                                                            position: 'absolute',
+                                                            inset: 0,
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            background: 'rgba(0,0,0,0.2)',
+                                                            pointerEvents: 'none'
+                                                        }}>
+                                                            <Play size={40} color="white" fill="white" opacity={0.8} />
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <img
+                                                        src={item.imageUrl}
+                                                        alt={item.caption || 'Gallery Image'}
+                                                        style={{
+                                                            width: '100%',
+                                                            display: 'block',
+                                                            transition: 'transform 0.7s cubic-bezier(0.4, 0, 0.2, 1)'
+                                                        }}
+                                                        className="gallery-image"
+                                                    />
+                                                )}
 
                                                 {/* Overlay */}
                                                 <div style={{
@@ -266,11 +298,20 @@ export default function GalleryContent({ items }: GalleryContentProps) {
                             onClick={(e) => e.stopPropagation()}
                             style={{ maxWidth: '90%', maxHeight: '80vh', position: 'relative' }}
                         >
-                            <img
-                                src={filteredGallery[selectedImage].imageUrl}
-                                alt="Selected"
-                                style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '12px', boxShadow: '0 30px 60px rgba(0,0,0,0.5)' }}
-                            />
+                            {filteredGallery[selectedImage].resourceType === 'video' ? (
+                                <video
+                                    src={filteredGallery[selectedImage].imageUrl}
+                                    controls
+                                    autoPlay
+                                    style={{ width: '100%', maxHeight: '70vh', borderRadius: '12px', boxShadow: '0 30px 60px rgba(0,0,0,0.5)' }}
+                                />
+                            ) : (
+                                <img
+                                    src={filteredGallery[selectedImage].imageUrl}
+                                    alt="Selected"
+                                    style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '12px', boxShadow: '0 30px 60px rgba(0,0,0,0.5)' }}
+                                />
+                            )}
                             <div style={{ marginTop: '20px', color: 'white', textAlign: 'center' }}>
                                 <span style={{ color: 'var(--gold)', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase' }}>{filteredGallery[selectedImage].category}</span>
                                 <p style={{ fontSize: '1.25rem', fontWeight: 600, marginTop: '8px' }}>{filteredGallery[selectedImage].caption}</p>

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma'; // Refreshed
 import slugify from 'slugify';
 
 export async function GET() {
@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
                 status: data.status || 'draft',
                 featured: data.featured || false,
                 featuredImage: data.featuredImage,
+                featuredImageResourceType: data.featuredImageResourceType || 'image',
                 publishedAt: data.status === 'published' ? new Date() : null,
             },
         });

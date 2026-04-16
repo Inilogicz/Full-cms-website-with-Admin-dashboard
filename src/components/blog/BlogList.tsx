@@ -14,6 +14,7 @@ interface Post {
     category: string;
     publishedAt: string | Date;
     featuredImage?: string | null;
+    featuredImageResourceType?: string;
 }
 
 const categories = ['All', 'Menstrual Health', 'Women Empowerment', 'Puberty Education', 'Healthcare Insights'];
@@ -96,7 +97,18 @@ export default function BlogList({ posts }: { posts: Post[] }) {
                                         }}>
                                             <div style={{ height: '240px', background: 'var(--gray-50)', position: 'relative', overflow: 'hidden' }}>
                                                 {post.featuredImage ? (
-                                                    <img src={post.featuredImage} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} className="card-hover-image" />
+                                                    post.featuredImageResourceType === 'video' ? (
+                                                        <video
+                                                            src={post.featuredImage}
+                                                            muted
+                                                            playsInline
+                                                            loop
+                                                            autoPlay
+                                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                        />
+                                                    ) : (
+                                                        <img src={post.featuredImage} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} className="card-hover-image" />
+                                                    )
                                                 ) : (
                                                     <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.1 }}><BookOpen size={48} /></div>
                                                 )}

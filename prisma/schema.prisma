@@ -42,6 +42,7 @@ model BlogPost {
   status         String   @default("draft") // draft, published, archived
   featured       Boolean  @default(false)
   featuredImage  String?
+  featuredImageResourceType String @default("image") // image, video
   publishedAt    DateTime?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -67,6 +68,7 @@ model GalleryItem {
   category  String?
   imageUrl  String
   publicId  String?
+  resourceType String   @default("image") // image, video
   order     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -105,6 +107,7 @@ model Media {
   id            String   @id @default(cuid())
   cloudinaryUrl String
   publicId      String   @unique
+  resourceType  String   @default("image") // image, video
   altText       String?
   width         Int?
   height        Int?

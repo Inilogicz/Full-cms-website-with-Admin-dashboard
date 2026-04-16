@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
             data: {
                 cloudinaryUrl: data.cloudinaryUrl,
                 publicId: data.publicId,
+                resourceType: data.resourceType || 'image',
                 altText: data.altText,
                 width: data.width,
                 height: data.height,

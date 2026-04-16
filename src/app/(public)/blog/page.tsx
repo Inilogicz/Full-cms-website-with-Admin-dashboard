@@ -10,14 +10,15 @@ export default async function BlogPage() {
         orderBy: { publishedAt: 'desc' }
     });
 
-    const posts = postsData.map(p => ({
+    const posts = postsData.map((p: any) => ({
         id: p.id,
         title: p.title,
         slug: p.slug,
         excerpt: p.excerpt || '',
         category: p.category,
         publishedAt: p.publishedAt || p.createdAt,
-        featuredImage: p.featuredImage
+        featuredImage: p.featuredImage,
+        featuredImageResourceType: p.featuredImageResourceType
     }));
 
     return (

@@ -8,6 +8,7 @@ interface Post {
     category: string;
     publishedAt: string | Date;
     featuredImage?: string | null;
+    featuredImageResourceType?: string;
 }
 
 export default function BlogContent({ post }: { post: Post }) {
@@ -66,13 +67,23 @@ export default function BlogContent({ post }: { post: Post }) {
                     borderRadius: 'var(--radius-2xl)',
                     overflow: 'hidden',
                     marginBottom: '48px',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.05)'
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.05)',
+                    background: 'var(--gray-900)'
                 }}>
-                    <img
-                        src={post.featuredImage}
-                        alt={post.title}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
+                    {post.featuredImageResourceType === 'video' ? (
+                        <video
+                            src={post.featuredImage}
+                            controls
+                            autoPlay
+                            style={{ width: '100%', height: '100%', display: 'block' }}
+                        />
+                    ) : (
+                        <img
+                            src={post.featuredImage}
+                            alt={post.title}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                    )}
                 </div>
             )}
 
